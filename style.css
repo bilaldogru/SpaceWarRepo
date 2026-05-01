@@ -152,3 +152,194 @@ body {
     line-height: 1.6;
     margin-bottom: 15px;
 }
+
+/* =======================================================
+   TAKTİKSEL GEZEGEN HARİTASI (SEÇİM EKRANI) CSS KODLARI
+   ======================================================= */
+
+.gezegen-haritasi {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.harita-gemi {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    font-size: 30px;
+    transform: rotate(45deg);
+    filter: drop-shadow(0 0 10px #5ae0ff);
+    z-index: 5;
+}
+
+/* Gezegenlerin kapsayıcısını büyüttük */
+.harita-noktasi {
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: süzülme 4s infinite ease-in-out alternate;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.astra {
+    animation-delay: 0s;
+}
+
+.vega {
+    animation-delay: 1s;
+}
+
+.nora {
+    animation-delay: 0.5s;
+}
+
+.kron {
+    animation-delay: 1.5s;
+}
+
+@keyframes süzülme {
+    0% {
+        transform: translateY(0px);
+    }
+
+    100% {
+        transform: translateY(-15px);
+    }
+}
+
+.harita-noktasi:hover {
+    transform: scale(1.15) !important;
+    z-index: 20;
+}
+
+/* Gezegen Küresi Temel Ayarları */
+.gezegen-kure {
+    border-radius: 50%;
+    position: relative;
+    z-index: 2;
+    transition: filter 0.3s ease;
+    /* Hover efekti için yumuşak geçiş */
+}
+
+/* Farenin üstüne gelince gezegenin parlaklığı artsın */
+.harita-noktasi:hover .gezegen-kure {
+    filter: brightness(1.3);
+}
+
+.gezegen-isim {
+    margin-top: 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    /* İsimleri de gezegenlere uyumlu olarak büyüttük */
+    color: #fff;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px #ffffff;
+    transition: 0.3s;
+    z-index: 3;
+}
+
+/* =======================================================
+   GEZEGENLERE ÖZEL İSİM PARLAMA EFEKTLERİ (HOVER)
+   ======================================================= */
+/* RENKLER DEĞİŞTİRİLDİ: Astra (Mor), Nora (Mavi) oldu */
+.astra:hover .gezegen-isim {
+    color: #e056fd;
+    text-shadow: 0 0 15px #e056fd;
+}
+
+/* Mor */
+.vega:hover .gezegen-isim {
+    color: #ffaa00;
+    text-shadow: 0 0 15px #ffaa00;
+}
+
+/* Turuncu */
+.nora:hover .gezegen-isim {
+    color: #5ae0ff;
+    text-shadow: 0 0 15px #5ae0ff;
+}
+
+/* Mavi */
+.kron:hover .gezegen-isim {
+    color: #55efc4;
+    text-shadow: 0 0 15px #55efc4;
+}
+
+/* Yeşil */
+
+/* =======================================================
+   TEMEL GEZEGEN KÜRESİ KODLARI (BOŞLUKLARI YOK EDEN YÖNTEM)
+   ======================================================= */
+.gezegen-kure {
+    /* Eski border-radius ve box-shadow SİLİNDİ */
+    position: relative;
+    z-index: 2;
+    transition: filter 0.3s ease;
+    /* CSS Değişkeni (var) ile PNG'nin sadece dolu piksellerini saran gölge */
+    filter: drop-shadow(0 0 15px var(--parlama-rengi));
+}
+
+.harita-noktasi:hover .gezegen-kure {
+    /* Fare üzerine gelince gölge yayılsın ve gezegen aydınlansın */
+    filter: drop-shadow(0 0 25px var(--parlama-rengi)) brightness(1.3);
+}
+
+/* =======================================================
+   GEZEGENLERİN KENDİNE HAS BOYUT VE RENK DEĞİŞKENLERİ
+   ======================================================= */
+
+/* --- GEZEGEN 1: ASTRA (Artık Mor Tema) --- */
+.astra .gezegen-kure {
+    width: 120px;
+    height: 120px;
+    background-image: url('assets/images/gezegen1.png');
+    /* Resmin kesilmeden tam sığması için 'cover' yerine 'contain' yaptık */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    --parlama-rengi: rgba(224, 86, 253, 0.8);
+    /* Mor Işık */
+}
+
+/* --- GEZEGEN 2: VEGA (Turuncu Tema) --- */
+.vega .gezegen-kure {
+    width: 90px;
+    height: 90px;
+    background-image: url('assets/images/gezegen2.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    --parlama-rengi: rgba(255, 170, 0, 0.8);
+    /* Turuncu Işık */
+}
+
+/* --- GEZEGEN 3: NORA (Artık Mavi Tema) --- */
+.nora .gezegen-kure {
+    width: 150px;
+    height: 150px;
+    background-image: url('assets/images/gezegen3.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    --parlama-rengi: rgba(90, 224, 255, 0.8);
+    /* Mavi Işık */
+}
+
+/* --- GEZEGEN 4: KRON (Yeşil Tema) --- */
+.kron .gezegen-kure {
+    width: 130px;
+    height: 130px;
+    background-image: url('assets/images/gezegen4.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    --parlama-rengi: rgba(85, 239, 196, 0.8);
+    /* Yeşil Işık */
+}

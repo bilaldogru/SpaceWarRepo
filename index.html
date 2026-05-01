@@ -39,8 +39,57 @@
         </div>
 
         <!-- Oyun Ekranı -->
-        <div id="oyun-alani" class="ekran-icerigi panel-kutusu" style="display: none;">
+        <div id="oyun-alani" class="ekran-icerigi"
+            style="display: none; width: 100vw; height: 100vh; position: relative; overflow: hidden;">
 
+            <!-- Taktiksel Gezegen Haritası (Artık Tüm Ekran) -->
+            <div class="gezegen-haritasi" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;">
+
+                <!-- MERKEZDEKİ YAZI -->
+                <div class="secim-baslik"
+                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 5;">
+                    <h2 class="panel-baslik"
+                        style="font-size: 55px; margin-bottom: 5px; text-shadow: 0 0 20px #5ae0ff;">Gezegen Sec</h2>
+                    <p class="panel-metin"
+                        style="font-size: 20px; color: #a0aabf; margin-bottom: 0; text-shadow: none;">Savunma haritasini
+                        secmek icin bir gezegene tikla</p>
+                </div>
+
+                <!-- Gezegen 1: Astra (SOL ÜST KÖŞE) -->
+                <div class="harita-noktasi astra" style="top: 15%; left: 10%;">
+                    <div class="gezegen-halka"></div>
+                    <div class="gezegen-kure"></div>
+                    <div class="gezegen-isim">Astra</div>
+                </div>
+
+                <!-- Gezegen 2: Vega (SAĞ ÜST KÖŞE) -->
+                <!-- Dikkat: Sağa yaslamak için 'left' yerine 'right' kullandık -->
+                <div class="harita-noktasi vega" style="top: 15%; right: 10%;">
+                    <div class="gezegen-halka"></div>
+                    <div class="gezegen-kure"></div>
+                    <div class="gezegen-isim">Vega</div>
+                </div>
+
+                <!-- Gezegen 3: Kron (SOL ALT KÖŞE) -->
+                <div class="harita-noktasi kron" style="bottom: 20%; left: 10%;">
+                    <div class="gezegen-halka"></div>
+                    <div class="gezegen-kure"></div>
+                    <div class="gezegen-isim">Kron</div>
+                </div>
+
+                <!-- Gezegen 4: Nora (SAĞ ALT KÖŞE) -->
+                <div class="harita-noktasi nora" style="bottom: 20%; right: 10%;">
+                    <div class="gezegen-halka"></div>
+                    <div class="gezegen-kure"></div>
+                    <div class="gezegen-isim">Nora</div>
+                </div>
+
+            </div>
+
+            <!-- Geri Dönüş Butonu (En Alt Merkezde) -->
+            <button id="oyundan-geri-btn" class="oyun-butonu kucuk-buton"
+                style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 10;">Menüye
+                Dön</button>
 
         </div>
 
