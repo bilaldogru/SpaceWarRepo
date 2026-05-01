@@ -10,6 +10,21 @@ import { aktifBolum, bolumleriBaslat } from './level.js';
 const canvas = document.getElementById('yildiz-alani');
 const ctx = canvas.getContext('2d');
 
+// Galaxy radar canvas
+const radarCanvas = document.getElementById('galaxy-radar');
+const radarCtx = radarCanvas ? radarCanvas.getContext('2d') : null;
+
+// Radar için sabit yıldız noktaları (gökada arka plan efekti)
+const radarYildizlar = [];
+for (let i = 0; i < 80; i++) {
+    radarYildizlar.push({
+        x: Math.random() * 220,
+        y: Math.random() * 140,
+        r: Math.random() * 1.2 + 0.3,
+        a: Math.random() * 0.6 + 0.2
+    });
+}
+
 // Ekran boyutunu ayarlar
 function boyutlandir() {
     canvas.width = window.innerWidth;
@@ -28,14 +43,13 @@ const yildizSayisi = 200;
 
 // Yıldızları oluştur
 for (let i = 0; i < yildizSayisi; i++) {
-    yildizlar.push(
-        {
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-            yaricap: Math.random() * 1.5 + 0.5,
-            hiz: Math.random() * 0.5 + 0.1,
-            parlaklik: Math.random()
-        });
+    yildizlar.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        yaricap: Math.random() * 1.5 + 0.5,
+        hiz: Math.random() * 0.5 + 0.1,
+        parlaklik: Math.random()
+    });
 }
 
 // Mouse sol tıka basıldığında ateş et
@@ -51,9 +65,99 @@ window.addEventListener('keydown', (olay) => {
     if ((olay.key === 'r' || olay.key === 'R') && aktifBolum) {
         aktifBolum.yenidenDoldur();
     }
-});
-// Ana oyun döngüsü
 
+    // Boşluk tuşu ile ateş et
+    if (olay.key === ' ') {
+        olay.preventDefault(); // Sayfanın kaymasını önle
+        if (!aktifBolum || aktifBolum.atesEtmeyeIzinVar()) {
+            mermiAtesle(gemi);
+        }
+    }
+});
+
+// --- GALAXY RADAR ÇİZİMİ ---
+function galaxyRadarCiz() {
+    if (!radarCtx || !aktifBolum || !aktifBolum.dusmanlar) {
+        if (radarCanvas) radarCanvas.style.display = 'none';
+        return;
+    }
+    radarCanvas.style.display = 'block';
+
+    const rw = radarCanvas.width;   // 220
+    const rh = radarCanvas.height;  // 140
+
+    radarCtx.clearRect(0, 0, rw, rh);
+
+    // Arka Plan: Karanlık uzay
+    radarCtx.fillStyle = 'rgba(3, 8, 20, 0.95)';
+    radarCtx.fillRect(0, 0, rw, rh);
+
+    // Gökada ışıltısı (merkez parlama)
+    const galaxyGlow = radarCtx.createRadialGradient(rw / 2, rh / 2, 5, rw / 2, rh / 2, 85);
+    galaxyGlow.addColorStop(0, 'rgba(90, 224, 255, 0.07)');
+    galaxyGlow.addColorStop(1, 'rgba(0,0,0,0)');
+    radarCtx.fillStyle = galaxyGlow;
+    radarCtx.fillRect(0, 0, rw, rh);
+
+    // Arka plan yıldızları
+    radarYildizlar.forEach(s => {
+        radarCtx.beginPath();
+        radarCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        radarCtx.fillStyle = `rgba(255,255,255,${s.a})`;
+        radarCtx.fill();
+    });
+
+    // Izgara çizgileri
+    radarCtx.strokeStyle = 'rgba(90, 224, 255, 0.09)';
+    radarCtx.lineWidth = 1;
+    for (let gx = 0; gx < rw; gx += 44) {
+        radarCtx.beginPath(); radarCtx.moveTo(gx, 0); radarCtx.lineTo(gx, rh); radarCtx.stroke();
+    }
+    for (let gy = 0; gy < rh; gy += 35) {
+        radarCtx.beginPath(); radarCtx.moveTo(0, gy); radarCtx.lineTo(rw, gy); radarCtx.stroke();
+    }
+
+    // Üs noktası (sol taraf — mavi nokta)
+    radarCtx.beginPath();
+    radarCtx.arc(14, rh / 2, 5, 0, Math.PI * 2);
+    radarCtx.fillStyle = '#5ae0ff';
+    radarCtx.shadowBlur = 10;
+    radarCtx.shadowColor = '#5ae0ff';
+    radarCtx.fill();
+    radarCtx.shadowBlur = 0;
+
+    // Düşman noktaları
+    const dusmanlar = aktifBolum.dusmanlar;
+    dusmanlar.forEach(d => {
+        // Oyun koordinatlarını radar koordinatlarına dönüştür
+        const rx = (d.x / canvas.width) * (rw - 28) + 14;
+        const ry = (d.y / canvas.height) * rh;
+
+        // Tip bazlı renk: Queen=altın, High=mor, Normal=kırmızı
+        let renk;
+        if (d.tip === 'queen')      renk = '#f39c12';
+        else if (d.tip === 'high')  renk = '#8e44ad';
+        else                        renk = '#ff4747';
+
+        const boyut = d.tip === 'queen' ? 5 : (d.tip === 'high' ? 3.5 : 2.5);
+
+        radarCtx.beginPath();
+        radarCtx.arc(rx, ry, boyut, 0, Math.PI * 2);
+        radarCtx.fillStyle = renk;
+        radarCtx.shadowBlur = d.tip === 'queen' ? 14 : 7;
+        radarCtx.shadowColor = renk;
+        radarCtx.fill();
+        radarCtx.shadowBlur = 0;
+    });
+
+    // Etiket
+    radarCtx.font = "bold 9px 'Orbitron', sans-serif";
+    radarCtx.fillStyle = 'rgba(90, 224, 255, 0.5)';
+    radarCtx.textAlign = 'left';
+    radarCtx.fillText('GALAXY RADAR', 6, 12);
+}
+
+// Ana oyun döngüsü
 function oyunDongusu() {
     // Ekranı temizler
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -88,6 +192,9 @@ function oyunDongusu() {
     if (aktifBolum && aktifBolum.oyunBitti) {
         aktifBolum.oyunSonuEkraniCiz(ctx, canvas);
     }
+
+    // Galaxy radar her karede güncellenir
+    galaxyRadarCiz();
 
     // Her karede oyunDongusu fonksiyonunu tekrar çalıştır
     requestAnimationFrame(oyunDongusu);

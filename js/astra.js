@@ -1,5 +1,7 @@
 // --- ASTRA GEZEGENI BOLUM DOSYASI ---
 
+import { NormalEnemy } from './enemy.js';
+
 export const astraBolumu = {
     isim: 'Astra',
     renk: '#e056fd',
@@ -21,6 +23,7 @@ export const astraBolumu = {
     yenidenDolumSuresi: 3000,
     oyunDevamEdiyor: false,
     oyunBitti: false,
+    sonOyuncuHasarZamani: -10,
     dusmanlar: [],
     koridorlar: [],
 
@@ -36,6 +39,7 @@ export const astraBolumu = {
         this.dusmanlar = [];
         this.oyunDevamEdiyor = true;
         this.oyunBitti = false;
+        this.sonOyuncuHasarZamani = -10;
         this.baslangicZamani = performance.now();
         this.sonDusmanZamani = performance.now();
         this.koridorlariHazirla(canvas);
@@ -71,17 +75,12 @@ export const astraBolumu = {
     },
 
     dusmanEkle: function (canvas, koridorNo, gecikme) {
-        const koridor = this.koridorlar[koridorNo];
-
-        this.dusmanlar.push({
-            x: canvas.width + 60 + gecikme,
-            y: koridor.y,
-            koridorNo: koridorNo,
-            hiz: 0.65 + (koridorNo * 0.08),
-            boyut: 32,
-            can: 60,
-            maxCan: 60
-        });
+        if (!this.koridorlar[koridorNo]) return;
+        const x = canvas.width + 60 + gecikme;
+        const y = this.koridorlar[koridorNo].y;
+        // Astra'da sadece Normal (kamikaze) düşmanlar var; istatistikler astra'ya özel
+        const dusman = new NormalEnemy(x, y, koridorNo, 0.65 + (koridorNo * 0.08), 32, 60);
+        this.dusmanlar.push(dusman);
     },
 
     sureyiYaz: function () {
@@ -192,6 +191,7 @@ export const astraBolumu = {
 
             if (gemi && this.dusmanGemiyeDegdiMi(dusman, gemi)) {
                 this.oyuncuCan -= 20;
+                this.sonOyuncuHasarZamani = this.gecenSure;
                 this.dusmanlar.splice(i, 1);
                 continue;
             }
@@ -203,6 +203,13 @@ export const astraBolumu = {
         }
 
         this.mermiCarpismalariniKontrolEt(mermiler);
+
+        // --- GEMİ PASİF İYİLEŞMESİ ---
+        // 3 saniye hasar almadıysa saniyede 2 can kazanır (%80 limite kadar)
+        if (this.gecenSure - this.sonOyuncuHasarZamani > 3 &&
+            this.oyuncuCan < this.maxOyuncuCan * 0.8) {
+            this.oyuncuCan = Math.min(this.maxOyuncuCan * 0.8, this.oyuncuCan + 2 / 60);
+        }
 
         if (this.can <= 0 || this.oyuncuCan <= 0) {
             if (this.can < 0) this.can = 0;
@@ -290,15 +297,20 @@ export const astraBolumu = {
         // 3. ASTRA CAN BARI
         this.canBariCiz(ctx, 36, Math.max(112, merkezY - gezegenYaricapi + 22), 180, 18, this.can, this.maxCan);
 
-        // 4. DUSMANLAR (Simdilik kare, sonradan skin giydirilebilir)
+        // 4. DUSMANLAR (Görselli çizim)
         this.dusmanlar.forEach(dusman => {
             const yari = dusman.boyut / 2;
 
-            ctx.fillStyle = '#ff4747';
-            ctx.shadowBlur = 12;
-            ctx.shadowColor = '#ff4747';
-            ctx.fillRect(dusman.x - yari, dusman.y - yari, dusman.boyut, dusman.boyut);
-            ctx.shadowBlur = 0;
+            if (dusman.image && dusman.image.complete && dusman.image.naturalWidth > 0) {
+                ctx.drawImage(dusman.image, dusman.x - yari, dusman.y - yari, dusman.boyut, dusman.boyut);
+            } else {
+                // Görsel yüklenmediyse yedek olarak kırmızı kare
+                ctx.fillStyle = '#ff4747';
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = '#ff4747';
+                ctx.fillRect(dusman.x - yari, dusman.y - yari, dusman.boyut, dusman.boyut);
+                ctx.shadowBlur = 0;
+            }
 
             this.canBariCiz(ctx, dusman.x - 20, dusman.y - yari - 12, 40, 5, dusman.can, dusman.maxCan);
         });
@@ -315,7 +327,7 @@ export const astraBolumu = {
         ctx.fillStyle = '#ff4747';
         ctx.shadowBlur = 25;
         ctx.shadowColor = '#ff4747';
-        ctx.fillText('OLDUNUZ', canvas.width / 2, canvas.height / 2 - 18);
+        ctx.fillText('END GAME ', canvas.width / 2, canvas.height / 2 - 18);
 
         ctx.font = "700 26px 'Rajdhani', sans-serif";
         ctx.fillStyle = '#ffffff';

@@ -509,3 +509,19 @@ body {
         height: 56px;
     }
 }
+
+/* =======================================================
+   GALAXY RADAR (Mini Harita)
+   ======================================================= */
+#galaxy-radar {
+    position: fixed;
+    bottom: 18px;
+    right: 18px;
+    border: 1px solid rgba(90, 224, 255, 0.55);
+    border-radius: 10px;
+    background: rgba(3, 8, 20, 0.82);
+    box-shadow: 0 0 22px rgba(90, 224, 255, 0.25), inset 0 0 14px rgba(0,0,0,0.5);
+    z-index: 200;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+}
