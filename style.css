@@ -343,3 +343,169 @@ body {
     --parlama-rengi: rgba(85, 239, 196, 0.8);
     /* Yeşil Işık */
 }
+
+/* --- OYUN ICI HUD TASARIMLARI --- */
+.oyun-hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    padding: 12px;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.hud-ust-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: linear-gradient(180deg, rgba(8, 14, 28, 0.92), rgba(12, 20, 38, 0.74));
+    border: 1px solid rgba(90, 224, 255, 0.75);
+    box-shadow: 0 0 24px rgba(90, 224, 255, 0.18), inset 0 0 18px rgba(90, 224, 255, 0.08);
+    padding: 10px;
+    border-radius: 8px;
+    pointer-events: auto;
+}
+
+.hud-taret-panel {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(82px, 1fr));
+    gap: 10px;
+    min-width: 0;
+}
+
+.hud-stat-panel {
+    flex: 0 0 310px;
+    display: grid;
+    grid-template-columns: repeat(2, 150px);
+    grid-auto-rows: 34px;
+    gap: 6px 8px;
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.hud-stat-kutu {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+    height: 34px;
+    box-sizing: border-box;
+    padding: 0 9px;
+    border: 1px solid rgba(90, 224, 255, 0.45);
+    border-radius: 5px;
+    background: rgba(3, 8, 18, 0.58);
+}
+
+.hud-stat-kutu span {
+    color: #5ae0ff;
+    min-width: 40px;
+    text-align: right;
+}
+
+.hud-menu-btn {
+    flex: 0 0 auto;
+    margin: 0;
+    min-width: 78px;
+}
+
+.hud-alt-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 18px;
+    color: #a0aabf;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.taret-slot {
+    min-width: 0;
+    height: 72px;
+    box-sizing: border-box;
+    border: 2px dashed #5ae0ff;
+    background: rgba(90, 224, 255, 0.08);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #5ae0ff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    cursor: pointer;
+    position: relative;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.taret-slot::before {
+    content: "";
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(90, 224, 255, 0.35);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.taret-numara {
+    position: absolute;
+    top: 5px;
+    right: 6px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(4, 9, 18, 0.9);
+    border: 1px solid rgba(90, 224, 255, 0.7);
+    color: #ffffff;
+    font-size: 11px;
+    line-height: 18px;
+    text-align: center;
+}
+
+.taret-slot:hover:not(.kilitli) {
+    background: rgba(90, 224, 255, 0.3);
+    border-style: solid;
+}
+
+.taret-slot.kilitli {
+    border-color: #ff4747;
+    color: #ff4747;
+    background: rgba(255, 71, 71, 0.1);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.taret-slot.kilitli .taret-numara {
+    border-color: rgba(255, 71, 71, 0.7);
+    color: #ffb3b3;
+}
+
+@media (max-width: 900px) {
+    .hud-ust-bar {
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+
+    .hud-taret-panel {
+        flex-basis: 100%;
+        grid-template-columns: repeat(5, minmax(54px, 1fr));
+    }
+
+    .hud-stat-panel {
+        flex: 1 1 auto;
+        grid-template-columns: repeat(2, minmax(124px, 1fr));
+        font-size: 11px;
+    }
+
+    .taret-slot {
+        height: 56px;
+    }
+}

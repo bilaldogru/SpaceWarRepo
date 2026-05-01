@@ -3,7 +3,8 @@
 
 import { arayuzuBaslat } from './ui.js';
 import { gemi, gemiGorseli, gemiyiGuncelle, gemiyiCiz } from './player.js';
-import { mermiAtesle, mermileriGuncelleVeCiz } from './projectile.js';
+import { mermiAtesle, mermiler, mermileriGuncelleVeCiz } from './projectile.js';
+import { aktifBolum, bolumleriBaslat } from './level.js';
 
 // Canvas ayarları
 const canvas = document.getElementById('yildiz-alani');
@@ -40,7 +41,15 @@ for (let i = 0; i < yildizSayisi; i++) {
 // Mouse sol tıka basıldığında ateş et
 window.addEventListener('mousedown', (olay) => {
     if (olay.button === 0) {
-        mermiAtesle(gemi);
+        if (!aktifBolum || aktifBolum.atesEtmeyeIzinVar()) {
+            mermiAtesle(gemi);
+        }
+    }
+});
+
+window.addEventListener('keydown', (olay) => {
+    if ((olay.key === 'r' || olay.key === 'R') && aktifBolum) {
+        aktifBolum.yenidenDoldur();
     }
 });
 // Ana oyun döngüsü
@@ -66,10 +75,19 @@ function oyunDongusu() {
         }
     }
 
+    if (aktifBolum) {
+        aktifBolum.guncelle(canvas, mermiler, gemi);
+        aktifBolum.ciz(ctx, canvas);
+    }
+
     // Diğer dosyalardaki fonksiyonları çalıştır
     gemiyiGuncelle(canvas);
     mermileriGuncelleVeCiz(ctx, canvas);
     gemiyiCiz(ctx);
+
+    if (aktifBolum && aktifBolum.oyunBitti) {
+        aktifBolum.oyunSonuEkraniCiz(ctx, canvas);
+    }
 
     // Her karede oyunDongusu fonksiyonunu tekrar çalıştır
     requestAnimationFrame(oyunDongusu);
@@ -77,8 +95,12 @@ function oyunDongusu() {
 
 // Oyunu başlatma adımları
 arayuzuBaslat();
+bolumleriBaslat();
 boyutlandir();
 
-gemiGorseli.onload = () => {
+if (gemiGorseli.complete) {
+    oyunDongusu();
+}
+else gemiGorseli.onload = () => {
     oyunDongusu();
 };

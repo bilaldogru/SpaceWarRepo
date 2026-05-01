@@ -42,7 +42,7 @@
         <div id="oyun-alani" class="ekran-icerigi"
             style="display: none; width: 100vw; height: 100vh; position: relative; overflow: hidden;">
 
-            <!-- Taktiksel Gezegen Haritası (Artık Tüm Ekran) -->
+            <!-- Taktiksel Gezegen Haritası  -->
             <div class="gezegen-haritasi" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;">
 
                 <!-- MERKEZDEKİ YAZI -->
@@ -86,10 +86,39 @@
 
             </div>
 
-            <!-- Geri Dönüş Butonu (En Alt Merkezde) -->
-            <button id="oyundan-geri-btn" class="oyun-butonu kucuk-buton"
-                style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 10;">Menüye
-                Dön</button>
+            <!-- OYUN İÇİ ARAYÜZ (HUD) - Başlangıçta Gizli -->
+            <div id="oyun-hud" class="oyun-hud" style="display: none;">
+
+                <!-- Üst Bar: Taretler ve Statlar -->
+                <div class="hud-ust-bar">
+
+                    <!-- Taret Slotları (5 Tane) -->
+                    <div class="hud-taret-panel">
+                        <div class="taret-slot"><span class="taret-numara">1</span></div>
+                        <div class="taret-slot"><span class="taret-numara">2</span></div>
+                        <div class="taret-slot"><span class="taret-numara">3</span></div>
+                        <div class="taret-slot kilitli"><span class="taret-numara">4</span></div>
+                        <div class="taret-slot kilitli"><span class="taret-numara">5</span></div>
+                    </div>
+
+                    <!-- Oyuncu Statları -->
+                    <div class="hud-stat-panel">
+                        <div class="hud-stat-kutu">Us Can: <span id="hud-can">100</span></div>
+                        <div class="hud-stat-kutu">Gemi Can: <span id="hud-oyuncu-can">100</span></div>
+                        <div class="hud-stat-kutu">Para: <span id="hud-para">200</span></div>
+                        <div class="hud-stat-kutu">Mermi: <span id="hud-mermi">15</span></div>
+                    </div>
+
+                    <!-- Ana Menüye Dönüş -->
+                    <button id="hud-ana-menu-btn" class="oyun-butonu kucuk-buton hud-menu-btn">Menu</button>
+                </div>
+
+                <!-- Alt Bilgi Barı: Süre ve Turn -->
+                <div class="hud-alt-bar">
+                    <div>Gecen Sure: <span id="hud-sure">00:00</span></div>
+                    <div>Turn: <span id="hud-turn">1</span> / 5 | Dusman: <span id="hud-dusman">0</span></div>
+                </div>
+            </div>
 
         </div>
 
