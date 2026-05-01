@@ -4,17 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <title>Space War</title>
+
+    <!-- Space War Yazı Tipi Daha Etkileyici Olması İçin Hazır Fontlar -->
     <link
         href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;700&display=swap"
         rel="stylesheet">
+
+    <!-- Space War CSS Kodları -->
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+    <!-- Canvas Kullanarak Yıldız Animasyonu Üretimi -->
     <canvas id="yildiz-alani"></canvas>
 
+    <!-- Oyunun Ana Arayüzü -->
     <div class="arayuz-kapsayici">
 
+        <!-- Ana Menü Ekranı -->
         <div id="ana-menu" class="ekran-icerigi">
 
             <div class="baslik-kapsayici">
@@ -31,19 +38,22 @@
 
         </div>
 
+        <!-- Oyun Ekranı -->
         <div id="oyun-alani" class="ekran-icerigi panel-kutusu" style="display: none;">
 
 
         </div>
 
+        <!-- Hakkında Ekranı -->
         <div id="hakkinda-alani" class="ekran-icerigi panel-kutusu" style="display: none;">
 
 
 
         </div>
+        <!-- Space War JavaScript Kodları -->
+        <script type="module" src="js/main.js"></script>
     </div>
 
-    <script type="module" src="js/main.js"></script>
 </body>
 
 </html>

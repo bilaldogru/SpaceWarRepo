@@ -1,10 +1,14 @@
+// Uzay gemimize ait mermilerin tanımlanması
 export const mermiler = [];
-const mermiHizi = 15;
+const mermiHizi = 10;
 
+// Mermi atma fonksiyonu
 export function mermiAtesle(gemi) {
+    // merminin çapraz atış için açısının hesaplanması.
     const hizX = Math.cos(gemi.aci) * mermiHizi;
     const hizY = Math.sin(gemi.aci) * mermiHizi;
 
+    // Merminin oluşturulması ve mermi dizisine eklenmesi yapılır.
     mermiler.push({
         x: gemi.x + Math.cos(gemi.aci) * (gemi.uzunluk / 2),
         y: gemi.y + Math.sin(gemi.aci) * (gemi.uzunluk / 2),
@@ -15,6 +19,7 @@ export function mermiAtesle(gemi) {
     });
 }
 
+// Mermilerin güncellenmesi ve çizilmesi sağlanır.
 export function mermileriGuncelleVeCiz(ctx, canvas) {
     for (let i = 0; i < mermiler.length; i++) {
         let mermi = mermiler[i];
