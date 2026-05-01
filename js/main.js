@@ -68,7 +68,7 @@ window.addEventListener('keydown', (olay) => {
 
     // Boşluk tuşu ile ateş et
     if (olay.key === ' ') {
-        olay.preventDefault(); // Sayfanın kaymasını önle
+        olay.preventDefault(); // Sayfanın kaymasını önler
         if (!aktifBolum || aktifBolum.atesEtmeyeIzinVar()) {
             mermiAtesle(gemi);
         }
@@ -135,9 +135,9 @@ function galaxyRadarCiz() {
 
         // Tip bazlı renk: Queen=altın, High=mor, Normal=kırmızı
         let renk;
-        if (d.tip === 'queen')      renk = '#f39c12';
-        else if (d.tip === 'high')  renk = '#8e44ad';
-        else                        renk = '#ff4747';
+        if (d.tip === 'queen') renk = '#f39c12';
+        else if (d.tip === 'high') renk = '#8e44ad';
+        else renk = '#ff4747';
 
         const boyut = d.tip === 'queen' ? 5 : (d.tip === 'high' ? 3.5 : 2.5);
 
