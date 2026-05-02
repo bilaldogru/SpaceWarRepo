@@ -1,3 +1,10 @@
+* {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
 body {
     background-color: #0b101e;
     font-family: 'Rajdhani', sans-serif;
@@ -7,6 +14,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    /* Metin seçimini engelleme */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     /* Fare imlecini değiştirme */
     cursor: url('assets/images/imlec.png'), auto;
 }
@@ -524,4 +536,4 @@ body {
     z-index: 200;
     pointer-events: none;
     backdrop-filter: blur(4px);
-}
+}

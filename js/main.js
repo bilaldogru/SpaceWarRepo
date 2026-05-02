@@ -117,16 +117,44 @@ function galaxyRadarCiz() {
         radarCtx.beginPath(); radarCtx.moveTo(0, gy); radarCtx.lineTo(rw, gy); radarCtx.stroke();
     }
 
-    // Üs noktası (sol taraf — mavi nokta)
+    // 1. GEZEGEN (Sol taraf — Yarım daire)
     radarCtx.beginPath();
-    radarCtx.arc(14, rh / 2, 5, 0, Math.PI * 2);
-    radarCtx.fillStyle = '#5ae0ff';
-    radarCtx.shadowBlur = 10;
-    radarCtx.shadowColor = '#5ae0ff';
+    radarCtx.arc(0, rh / 2, 36, -Math.PI / 2, Math.PI / 2);
+    const planetGrad = radarCtx.createLinearGradient(0, 0, 36, 0);
+    planetGrad.addColorStop(0, aktifBolum.renk || '#5ae0ff');
+    planetGrad.addColorStop(1, 'transparent');
+    radarCtx.fillStyle = planetGrad;
+    radarCtx.globalAlpha = 0.6;
     radarCtx.fill();
-    radarCtx.shadowBlur = 0;
+    radarCtx.globalAlpha = 1.0;
+    
+    // Gezegen sınır çizgisi
+    radarCtx.strokeStyle = aktifBolum.renk || '#5ae0ff';
+    radarCtx.lineWidth = 1.5;
+    radarCtx.stroke();
 
-    // Düşman noktaları
+    // 2. OYUNCU GEMİSİ (Mavi büyük nokta)
+    if (gemi) {
+        const prx = (gemi.x / canvas.width) * (rw - 28) + 14;
+        const pry = (gemi.y / canvas.height) * rh;
+
+        radarCtx.beginPath();
+        radarCtx.arc(prx, pry, 5, 0, Math.PI * 2);
+        radarCtx.fillStyle = '#5ae0ff';
+        radarCtx.shadowBlur = 15;
+        radarCtx.shadowColor = '#5ae0ff';
+        radarCtx.fill();
+        
+        // Merkez beyaz nokta (daha şık durması için)
+        radarCtx.beginPath();
+        radarCtx.arc(prx, pry, 1.5, 0, Math.PI * 2);
+        radarCtx.fillStyle = '#ffffff';
+        radarCtx.fill();
+        
+        radarCtx.shadowBlur = 0;
+    }
+
+    // 3. DÜŞMAN NOKTALARI
     const dusmanlar = aktifBolum.dusmanlar;
     dusmanlar.forEach(d => {
         // Oyun koordinatlarını radar koordinatlarına dönüştür
@@ -139,12 +167,12 @@ function galaxyRadarCiz() {
         else if (d.tip === 'high') renk = '#8e44ad';
         else renk = '#ff4747';
 
-        const boyut = d.tip === 'queen' ? 5 : (d.tip === 'high' ? 3.5 : 2.5);
+        const boyut = d.tip === 'queen' ? 4.5 : (d.tip === 'high' ? 3 : 2);
 
         radarCtx.beginPath();
         radarCtx.arc(rx, ry, boyut, 0, Math.PI * 2);
         radarCtx.fillStyle = renk;
-        radarCtx.shadowBlur = d.tip === 'queen' ? 14 : 7;
+        radarCtx.shadowBlur = d.tip === 'queen' ? 12 : 6;
         radarCtx.shadowColor = renk;
         radarCtx.fill();
         radarCtx.shadowBlur = 0;
