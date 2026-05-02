@@ -1,44 +1,72 @@
 import { astraBolumu } from './astra.js';
 import { noraBolumu } from './nora.js';
+import { vegaBolumu } from './vega.js';
 import { NormalEnemy, HighEnemy, QueenEnemy } from './enemy.js';
 
 export let aktifBolum = null;
+
+// Taret slotlarını açan/kapatan yardımcı fonksiyon
+function taretleriGuncelle(acikSayisi) {
+    const slotlar = document.querySelectorAll('.taret-slot');
+    slotlar.forEach((slot, index) => {
+        if (index < acikSayisi) {
+            slot.classList.remove('kilitli');
+        } else {
+            slot.classList.add('kilitli');
+        }
+    });
+}
 
 export function bolumleriBaslat() {
     const anaMenu = document.getElementById('ana-menu');
     const oyunAlani = document.getElementById('oyun-alani');
     const astraGezegeni = document.querySelector('.astra');
     const noraGezegeni = document.querySelector('.nora');
+    const vegaGezegeni = document.querySelector('.vega');
     const gezegenHaritasi = document.querySelector('.gezegen-haritasi');
     const secimBaslik = document.querySelector('.secim-baslik');
     const oyunHud = document.getElementById('oyun-hud');
     const canvas = document.getElementById('yildiz-alani');
     const hudMenuBtn = document.getElementById('hud-ana-menu-btn');
 
+    // Astra gezegeni (2 taret açık)
     astraGezegeni?.addEventListener('click', () => {
         aktifBolum = astraBolumu;
+        taretleriGuncelle(2);
         aktifBolum.baslat(canvas);
 
-        // Haritayi gizle, HUD'i ac.
         if (gezegenHaritasi) gezegenHaritasi.style.display = 'none';
         if (secimBaslik) secimBaslik.style.display = 'none';
         if (oyunHud) oyunHud.style.display = 'flex';
 
-        // Astra atmosferi.
         canvas.style.backgroundColor = 'rgba(22, 5, 30, 0.9)';
         canvas.style.boxShadow = `inset 0 0 150px ${aktifBolum.renk}`;
     });
 
-    // Nora gezegeni tiklama
-    noraGezegeni?.addEventListener('click', () => {
-        aktifBolum = noraBolumu;
+    // Vega gezegeni (4 taret açık)
+    vegaGezegeni?.addEventListener('click', () => {
+        aktifBolum = vegaBolumu;
+        taretleriGuncelle(4);
         aktifBolum.baslat(canvas);
 
         if (gezegenHaritasi) gezegenHaritasi.style.display = 'none';
         if (secimBaslik) secimBaslik.style.display = 'none';
         if (oyunHud) oyunHud.style.display = 'flex';
 
-        // Nora atmosferi (karadelik rengi)
+        canvas.style.backgroundColor = 'rgba(5, 20, 35, 0.95)';
+        canvas.style.boxShadow = `inset 0 0 150px ${aktifBolum.renk}`;
+    });
+
+    // Nora gezegeni (5 taret açık)
+    noraGezegeni?.addEventListener('click', () => {
+        aktifBolum = noraBolumu;
+        taretleriGuncelle(5);
+        aktifBolum.baslat(canvas);
+
+        if (gezegenHaritasi) gezegenHaritasi.style.display = 'none';
+        if (secimBaslik) secimBaslik.style.display = 'none';
+        if (oyunHud) oyunHud.style.display = 'flex';
+
         canvas.style.backgroundColor = 'rgba(5, 5, 5, 0.95)';
         canvas.style.boxShadow = `inset 0 0 150px ${aktifBolum.renk}`;
     });
@@ -62,7 +90,7 @@ export class LevelManager {
     constructor() {
         this.currentLevel = 1;
         this.enemies = [];
-        
+
         // Düşman doğma ayarları (Milisaniye cinsinden)
         this.spawnTimer = 0;
         this.baseSpawnInterval = 2000; // Başlangıçta 2 saniyede bir düşman
@@ -115,7 +143,7 @@ export class LevelManager {
 
         this.enemies.push(newEnemy);
     }
-    
+
     // Seviye atlama fonksiyonunu kendi oyun döngünde bir şarta bağlayabilirsin (örn: her 30 saniyede bir veya belirli bir skorda)
     levelUp() {
         this.currentLevel++;

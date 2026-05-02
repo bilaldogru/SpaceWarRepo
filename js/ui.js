@@ -31,6 +31,19 @@ export function arayuzuBaslat() {
     hakkindaBtn?.addEventListener('click', () => {
         tumEkranlariGizle();
         hakkindaAlani.style.display = 'flex';
+
+        // Hikayeyi dış dosyadan çekme
+        fetch('Hikaye.txt')
+            .then(response => response.text())
+            .then(data => {
+                const hikayeIcerik = document.getElementById('hikaye-icerik');
+                if (hikayeIcerik) hikayeIcerik.innerHTML = data;
+            })
+            .catch(err => {
+                console.error("Hikaye yüklenemedi:", err);
+                const hikayeIcerik = document.getElementById('hikaye-icerik');
+                if (hikayeIcerik) hikayeIcerik.textContent = "Hikaye şu an yüklenemiyor...";
+            });
     });
 
     // Çıkış butonu
