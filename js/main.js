@@ -119,7 +119,7 @@ function galaxyRadarCiz() {
 
     // 1. GEZEGEN (Sol taraf — Yarım daire)
     radarCtx.beginPath();
-    radarCtx.arc(0, rh / 2, 36, -Math.PI / 2, Math.PI / 2);
+    radarCtx.arc(0, rh / 2, 42, -Math.PI / 2, Math.PI / 2);
     const planetGrad = radarCtx.createLinearGradient(0, 0, 36, 0);
     planetGrad.addColorStop(0, aktifBolum.renk || '#5ae0ff');
     planetGrad.addColorStop(1, 'transparent');

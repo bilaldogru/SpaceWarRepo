@@ -9,6 +9,9 @@ Vega gezegeni, Astra ve Nora ile uyumlu ancak kendine has görsel efektlere sahi
   - Parlama: `#5ae0ff`
   - Derinlik (Gradyan): `#004e92`
 - **Oynanış:** Sol tarafta yarım daire şeklinde gezegen ve Astra ile aynı temel savunma mantığı (üs, düşman dalgaları) entegre edildi.
+- **Özel Yetenekler:**
+    - **İyon Fırtınası (Ion Storm):** Vega'nın savunma sistemi her 12 saniyede bir iyon dalgası yayar. Bu dalga tüm düşmanları 3 saniye boyunca dondurur.
+    - **Zincirleme Atış (Chain Shot):** Mermiler bir düşmana çarptığında en yakınındaki başka bir düşmana sıçrayarak elektrik arkı oluşturur ve ek hasar verir.
 
 ## 2. Dinamik Taret Sistemi (`js/level.js`)
 `level.js` dosyasına eklenen `taretleriGuncelle` fonksiyonu ile her gezegenin zorluk seviyesine göre açık taret sayısı belirlendi:
