@@ -111,8 +111,8 @@ body {
     font-weight: 700;
     font-size: 20px;
     padding: 15px 30px;
-    /* Fare imlecini değiştirme */
-    cursor: url('assets/images/imlec.png'), crosshair;
+    /* Standart pointer: tıklanabilir alan tam dikdörtgenle örtüşür */
+    cursor: pointer;
     border-radius: 8px;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     position: relative;
@@ -198,6 +198,8 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    /* Wrapper’ın boş alanına tıklama çalmasın; sadece görsel öğeler tetiklesin */
+    pointer-events: none;
 }
 
 .astra {
@@ -226,9 +228,15 @@ body {
     }
 }
 
-.harita-noktasi:hover {
-    transform: scale(1.15) !important;
+/* Hover: wrapper’a değil, görsel öğelere uygulanır */
+.gezegen-kure:hover,
+.gezegen-isim:hover {
     z-index: 20;
+}
+
+.gezegen-kure:hover {
+    filter: drop-shadow(0 0 25px var(--parlama-rengi)) brightness(1.4) !important;
+    transform: scale(1.15);
 }
 
 /* Gezegen Küresi Temel Ayarları */
@@ -243,6 +251,14 @@ body {
 /* Farenin üstüne gelince gezegenin parlaklığı artsın */
 .harita-noktasi:hover .gezegen-kure {
     filter: brightness(1.3);
+}
+
+/* Gezegen küresini ve ismini tıklanabilir yap (wrapper değil) */
+.gezegen-kure,
+.gezegen-isim {
+    pointer-events: auto;
+    cursor: pointer;
+    transition: filter 0.3s ease, transform 0.3s ease;
 }
 
 .gezegen-isim {
@@ -260,26 +276,26 @@ body {
 /* =======================================================
    GEZEGENLERE ÖZEL İSİM PARLAMA EFEKTLERİ (HOVER)
    ======================================================= */
-/* RENKLER DEĞİŞTİRİLDİ: Astra (Mor), Nora (Mavi) oldu */
-.astra:hover .gezegen-isim {
+/* wrapper pointer-events:none olduğu için isim hover'ı doğrudan tanımlıyoruz */
+.astra .gezegen-isim:hover {
     color: #e056fd;
     text-shadow: 0 0 15px #e056fd;
 }
 
 /* Mor */
-.vega:hover .gezegen-isim {
+.vega .gezegen-isim:hover {
     color: #ffaa00;
     text-shadow: 0 0 15px #ffaa00;
 }
 
 /* Turuncu */
-.nora:hover .gezegen-isim {
+.nora .gezegen-isim:hover {
     color: #5ae0ff;
     text-shadow: 0 0 15px #5ae0ff;
 }
 
 /* Mavi */
-.kron:hover .gezegen-isim {
+.kron .gezegen-isim:hover {
     color: #55efc4;
     text-shadow: 0 0 15px #55efc4;
 }
@@ -298,7 +314,7 @@ body {
     filter: drop-shadow(0 0 15px var(--parlama-rengi));
 }
 
-.harita-noktasi:hover .gezegen-kure {
+.gezegen-kure:hover {
     /* Fare üzerine gelince gölge yayılsın ve gezegen aydınlansın */
     filter: drop-shadow(0 0 25px var(--parlama-rengi)) brightness(1.3);
 }

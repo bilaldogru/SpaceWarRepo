@@ -1,6 +1,7 @@
 import { astraBolumu } from './astra.js';
 import { noraBolumu } from './nora.js';
 import { vegaBolumu } from './vega.js';
+import { kronBolumu } from './kron.js';
 import { NormalEnemy, HighEnemy, QueenEnemy } from './enemy.js';
 
 export let aktifBolum = null;
@@ -23,6 +24,7 @@ export function bolumleriBaslat() {
     const astraGezegeni = document.querySelector('.astra');
     const noraGezegeni = document.querySelector('.nora');
     const vegaGezegeni = document.querySelector('.vega');
+    const kronGezegeni = document.querySelector('.kron');
     const gezegenHaritasi = document.querySelector('.gezegen-haritasi');
     const secimBaslik = document.querySelector('.secim-baslik');
     const oyunHud = document.getElementById('oyun-hud');
@@ -68,6 +70,20 @@ export function bolumleriBaslat() {
         if (oyunHud) oyunHud.style.display = 'flex';
 
         canvas.style.backgroundColor = 'rgba(5, 5, 5, 0.95)';
+        canvas.style.boxShadow = `inset 0 0 150px ${aktifBolum.renk}`;
+    });
+
+    // Kron gezegeni (Eğlence Modu - 3 taret açık)
+    kronGezegeni?.addEventListener('click', () => {
+        aktifBolum = kronBolumu;
+        taretleriGuncelle(3);
+        aktifBolum.baslat(canvas);
+
+        if (gezegenHaritasi) gezegenHaritasi.style.display = 'none';
+        if (secimBaslik) secimBaslik.style.display = 'none';
+        if (oyunHud) oyunHud.style.display = 'flex';
+
+        canvas.style.backgroundColor = 'rgba(10, 20, 10, 0.95)';
         canvas.style.boxShadow = `inset 0 0 150px ${aktifBolum.renk}`;
     });
 

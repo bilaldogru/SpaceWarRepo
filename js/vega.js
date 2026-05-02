@@ -26,6 +26,15 @@ export const vegaBolumu = {
     sonOyuncuHasarZamani: -10,
     dusmanlar: [],
     koridorlar: [],
+    
+    // --- YENİ ÖZELLİKLER ---
+    firtinaAraligi: 12000, // 12 saniyede bir
+    firtinaSuresi: 3000,   // 3 saniye sürer
+    sonFirtinaZamani: 0,   // Son fırtına bitişi (bir sonraki için bekleme başlangıcı)
+    firtinaBaslamaZamani: 0, // Fırtına ne zaman başladı (süre ölçümü için)
+    firtinaAktif: false,
+    firtinaHalkasi: 0,
+    zincirler: [],        // Görsel efektler için
 
     // Bolum basladiginda cagrilacak ilk ayarlar
     baslat: function (canvas) {
@@ -42,6 +51,11 @@ export const vegaBolumu = {
         this.sonOyuncuHasarZamani = -10;
         this.baslangicZamani = performance.now();
         this.sonDusmanZamani = performance.now();
+        this.sonFirtinaZamani = performance.now();
+        this.firtinaBaslamaZamani = 0;
+        this.firtinaAktif = false;
+        this.firtinaHalkasi = 0;
+        this.zincirler = [];
         this.koridorlariHazirla(canvas);
 
         // Her koridordan ilk dusmanlar gelsin.
@@ -134,6 +148,22 @@ export const vegaBolumu = {
         this.huduGuncelle();
     },
 
+    // En yakın düşmanı bulma (Zincirleme atış için)
+    enYakinDusmanBul: function (kaynakDusman, haricIndex) {
+        let enYakin = null;
+        let minMesafe = 250; // Sıçrama menzili
+
+        this.dusmanlar.forEach((d, index) => {
+            if (index === haricIndex) return;
+            const mesafe = Math.sqrt(Math.pow(d.x - kaynakDusman.x, 2) + Math.pow(d.y - kaynakDusman.y, 2));
+            if (mesafe < minMesafe) {
+                minMesafe = mesafe;
+                enYakin = { dusman: d, index: index };
+            }
+        });
+        return enYakin;
+    },
+
     mermiCarpismalariniKontrolEt: function (mermiler) {
         for (let i = mermiler.length - 1; i >= 0; i--) {
             const mermi = mermiler[i];
@@ -148,12 +178,40 @@ export const vegaBolumu = {
                     mermi.y > dusman.y - yari &&
                     mermi.y < dusman.y + yari
                 ) {
+                    // Ana düşmana hasar
                     dusman.can -= 25;
+                    
+                    // --- ZİNCİRLEME ATIŞ (CHAIN SHOT) ---
+                    // Sıçramayı ANA düşmana hasar vermeden önce hesapla (index güvenli olsun)
+                    const sicrama = this.enYakinDusmanBul(dusman, j);
+                    if (sicrama) {
+                        sicrama.dusman.can -= 15; // Sıçrama hasarı biraz daha az
+                        this.zincirler.push({
+                            x1: dusman.x,
+                            y1: dusman.y,
+                            x2: sicrama.dusman.x,
+                            y2: sicrama.dusman.y,
+                            zaman: performance.now()
+                        });
+
+                        if (sicrama.dusman.can <= 0) {
+                            this.dusmanlar.splice(sicrama.index, 1);
+                            this.para += 12;
+                            // Sıçrama hedefi, ana düşmandan (j) önce geliyorsa j'yi kaydır
+                            // (splice yapılınca j'nin gösterdiği eleman kayar)
+                        }
+                    }
+
                     mermiler.splice(i, 1);
 
                     if (dusman.can <= 0) {
-                        this.dusmanlar.splice(j, 1);
-                        this.para += 12; // Vega'da düşman başına biraz daha fazla para
+                        // Eğer sıçrama hedefi daha düşük bir index'teyse j kayar, ama
+                        // dusman ref'i hâlâ geçerli olduğundan splice güvenle yapılabilir
+                        const jDuzeltilmis = this.dusmanlar.indexOf(dusman);
+                        if (jDuzeltilmis !== -1) {
+                            this.dusmanlar.splice(jDuzeltilmis, 1);
+                            this.para += 12;
+                        }
                     }
 
                     break;
@@ -184,10 +242,33 @@ export const vegaBolumu = {
 
         const savunmaX = this.savunmaUssuX(canvas);
 
+        // --- İYON FIRTINASI KONTROLÜ ---
+        const simdi = performance.now();
+        if (!this.firtinaAktif && simdi - this.sonFirtinaZamani > this.firtinaAraligi) {
+            this.firtinaAktif = true;
+            this.firtinaHalkasi = 0;
+            this.firtinaBaslamaZamani = simdi; // Fırtına başladı, ayrı timer
+        }
+
+        if (this.firtinaAktif && simdi - this.firtinaBaslamaZamani > this.firtinaSuresi) {
+            this.firtinaAktif = false;
+            this.sonFirtinaZamani = simdi; // Bitti, bir sonraki fırtına için beklemeyi başlat
+        }
+
+        // Zincir efektlerini temizle (0.2 saniye sonra)
+        this.zincirler = this.zincirler.filter(z => simdi - z.zaman < 200);
+
         for (let i = this.dusmanlar.length - 1; i >= 0; i--) {
             const dusman = this.dusmanlar[i];
             dusman.y = this.koridorlar[dusman.koridorNo].y;
-            dusman.x -= dusman.hiz;
+            
+            // Eğer fırtına aktifse düşmanlar hareket edemez
+            if (!this.firtinaAktif) {
+                dusman.x -= dusman.hiz;
+                dusman.donmus = false;
+            } else {
+                dusman.donmus = true;
+            }
 
             if (gemi && this.dusmanGemiyeDegdiMi(dusman, gemi)) {
                 this.oyuncuCan -= 20;
@@ -311,8 +392,54 @@ export const vegaBolumu = {
             }
 
             this.canBariCiz(ctx, dusman.x - 20, dusman.y - yari - 12, 40, 5, dusman.can, dusman.maxCan);
+            
+            // Eğer donmuşsa efekt ekle
+            if (dusman.donmus) {
+                ctx.save();
+                ctx.strokeStyle = '#5ae0ff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(dusman.x, dusman.y, yari + 5, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
         });
 
+        // 5. İYON FIRTINASI HALKASI
+        if (this.firtinaAktif) {
+            this.firtinaHalkasi += 15;
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(savunmaX, merkezY, this.firtinaHalkasi, -Math.PI / 2, Math.PI / 2);
+            ctx.strokeStyle = 'rgba(90, 224, 255, 0.4)';
+            ctx.lineWidth = 10;
+            ctx.shadowBlur = 30;
+            ctx.shadowColor = '#5ae0ff';
+            ctx.stroke();
+            
+            // Ekran parlaması
+            ctx.fillStyle = 'rgba(90, 224, 255, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
+        }
+
+        // 6. ZİNCİRLEME EFEKTLERİ
+        this.zincirler.forEach(z => {
+            ctx.save();
+            ctx.strokeStyle = '#5ae0ff';
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#00d2ff';
+            ctx.beginPath();
+            ctx.moveTo(z.x1, z.y1);
+            // Zikzak efekti için araya nokta ekleyelim
+            const midX = (z.x1 + z.x2) / 2 + (Math.random() - 0.5) * 20;
+            const midY = (z.y1 + z.y2) / 2 + (Math.random() - 0.5) * 20;
+            ctx.lineTo(midX, midY);
+            ctx.lineTo(z.x2, z.y2);
+            ctx.stroke();
+            ctx.restore();
+        });
     },
 
     oyunSonuEkraniCiz: function (ctx, canvas) {
