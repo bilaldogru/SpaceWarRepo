@@ -2,6 +2,7 @@
 
 import { NormalEnemy } from './enemy.js';
 import { drawSidePlanetScene } from './sceneVisuals.js';
+import { sfxAcik } from './audio.js';
 
 export const astraBolumu = {
     isim: 'Astra',
@@ -118,6 +119,9 @@ export const astraBolumu = {
         }
 
         this.mermi--;
+
+        const atisSesi = new Audio('audios/atis_sesi_anlik.mp3');
+        if (sfxAcik) atisSesi.play().catch(err => console.log("Ses çalınamadı:", err));
 
         if (this.mermi <= 0) {
             this.yenidenDoldur();

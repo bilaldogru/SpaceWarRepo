@@ -1,5 +1,9 @@
+import { muzikBaslangic, muzikDurdurTum, sesleriAyarla } from './audio.js';
+
 // Arayüz kontrol fonksiyonu
 export function arayuzuBaslat() {
+    sesleriAyarla();
+
     // Butonlar ve arayüz elemanları çekilir.
     const anaMenu = document.getElementById('ana-menu');
     const oyunAlani = document.getElementById('oyun-alani');
@@ -9,8 +13,16 @@ export function arayuzuBaslat() {
     const hakkindaBtn = document.getElementById('hakkinda-btn');
     const cikisBtn = document.getElementById('cikis-btn');
 
-    const oyundanGeriBtn = document.getElementById('oyundan-geri-btn');
     const hakkindaGeriBtn = document.getElementById('hakkinda-geri-btn');
+
+    const playBaslangic = () => {
+        if (muzikBaslangic.paused) {
+            muzikDurdurTum();
+            muzikBaslangic.play().catch(e => console.log("Müzik etkileşim bekliyor."));
+        }
+    };
+
+    document.addEventListener('click', playBaslangic, { once: true });
 
     // yeni bir ekran açıldığında mevcut ekranların gizlenmesini sağlanır.
     function tumEkranlariGizle() {
@@ -25,12 +37,14 @@ export function arayuzuBaslat() {
     baslaBtn?.addEventListener('click', () => {
         tumEkranlariGizle();
         oyunAlani.style.display = 'flex';
+        playBaslangic();
     });
 
     // Hakkında butonu
     hakkindaBtn?.addEventListener('click', () => {
         tumEkranlariGizle();
         hakkindaAlani.style.display = 'flex';
+        playBaslangic();
 
         // Hikayeyi dış dosyadan çekme
         fetch('Hikaye.txt')
@@ -53,13 +67,10 @@ export function arayuzuBaslat() {
         }
     });
 
-    oyundanGeriBtn?.addEventListener('click', () => {
-        tumEkranlariGizle();
-        anaMenu.style.display = 'flex';
-    });
 
     hakkindaGeriBtn?.addEventListener('click', () => {
         tumEkranlariGizle();
         anaMenu.style.display = 'flex';
+        playBaslangic();
     });
 }

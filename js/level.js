@@ -3,7 +3,7 @@ import { noraBolumu } from './nora.js';
 import { vegaBolumu } from './vega.js';
 import { kronBolumu } from './kron.js';
 import { NormalEnemy, HighEnemy, QueenEnemy } from './enemy.js';
-
+import { muzikBaslangic, muzikSakin, muzikAksiyon, muzikDurdurTum } from './audio.js';
 export let aktifBolum = null;
 
 const taretBilgileri = [
@@ -152,6 +152,13 @@ export function bolumleriBaslat() {
 
         canvas.style.backgroundColor = ayar.arkaPlan;
         canvas.style.boxShadow = `inset 0 0 150px ${aktifBolum.renk}`;
+
+        muzikDurdurTum();
+        if (ayar.bolum === kronBolumu) {
+            muzikAksiyon.play().catch(e => console.log(e));
+        } else {
+            muzikSakin.play().catch(e => console.log(e));
+        }
     }
 
     kronSkorunuGuncelle();
@@ -186,6 +193,9 @@ export function bolumleriBaslat() {
 
         canvas.style.backgroundColor = 'black';
         canvas.style.boxShadow = 'none';
+
+        muzikDurdurTum();
+        muzikBaslangic.play().catch(e => console.log(e));
     });
 }
 

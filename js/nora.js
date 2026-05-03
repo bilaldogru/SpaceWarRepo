@@ -2,6 +2,7 @@
 
 import { NormalEnemy, HighEnemy, QueenEnemy } from './enemy.js';
 import { drawSidePlanetScene } from './sceneVisuals.js';
+import { muzikAksiyon, muzikDurdurTum, sfxAcik } from './audio.js';
 
 export const noraBolumu = {
     isim: 'Nora',
@@ -144,6 +145,10 @@ export const noraBolumu = {
         if (!this.oyunDevamEdiyor || this.oyunBitti || this.yenidenDoluyor) return false;
         if (this.mermi <= 0) { this.yenidenDoldur(); return false; }
         this.mermi--;
+
+        const atisSesi = new Audio('audios/atis_sesi_anlik.mp3');
+        if (sfxAcik) atisSesi.play().catch(err => console.log("Ses çalınamadı:", err));
+
         if (this.mermi <= 0) this.yenidenDoldur();
         this.huduGuncelle();
         return true;
@@ -215,6 +220,12 @@ export const noraBolumu = {
             hedefZaman: simdi + d.gecikme
         }));
         this.dalgaArasiMi = false;
+
+        if (this.aktifDalga === this.maxDalga) {
+            muzikDurdurTum();
+            muzikAksiyon.play().catch(e => console.log(e));
+        }
+
         this.huduGuncelle();
     },
 

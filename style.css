@@ -34,6 +34,47 @@ body {
     cursor: url('assets/images/imlec.png'), crosshair;
 }
 
+/* Sabit ses kontrol paneli — tüm ekranlarda görünür */
+#ses-kontrolleri {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 9999;
+    display: flex;
+    gap: 8px;
+    pointer-events: auto;
+}
+
+.ses-sabit-btn {
+    padding: 0;
+    margin: 0;
+    width: 44px;
+    height: 44px;
+    min-width: unset;
+    font-size: 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    letter-spacing: 0;
+    background: rgba(11, 25, 44, 0.85);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(90, 224, 255, 0.55);
+    box-shadow: 0 0 12px rgba(90, 224, 255, 0.15);
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.ses-sabit-btn:hover {
+    background: rgba(90, 224, 255, 0.2);
+    box-shadow: 0 0 18px rgba(90, 224, 255, 0.4);
+    border-color: #ffffff;
+    transform: scale(1.08);
+}
+
+
 .arayuz-kapsayici {
     position: relative;
     z-index: 10;

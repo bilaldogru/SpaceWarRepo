@@ -1,7 +1,8 @@
 // --- VEGA GEZEGENI BOLUM DOSYASI ---
 
-import { NormalEnemy } from './enemy.js';
+import { NormalEnemy, HighEnemy, QueenEnemy } from './enemy.js';
 import { drawSidePlanetScene } from './sceneVisuals.js';
+import { sfxAcik } from './audio.js';
 
 export const vegaBolumu = {
     isim: 'Vega',
@@ -19,7 +20,7 @@ export const vegaBolumu = {
     gecenSure: 0,
     baslangicZamani: 0,
     sonDusmanZamani: 0,
-    dusmanAraligi: 3000, // Astra'dan biraz daha hızlı (3.3s -> 3.0s)
+    dusmanAraligi: 5500, // Vega dalga aralığı (ms) — Astra'dan daha zor ama boğulmayan bir tempo
     yenidenDoluyor: false,
     yenidenDolumBaslangic: 0,
     yenidenDolumSuresi: 2800, // Biraz daha hızlı dolum
@@ -37,6 +38,7 @@ export const vegaBolumu = {
     firtinaAktif: false,
     firtinaHalkasi: 0,
     zincirler: [],        // Görsel efektler için
+    lazerler: [],         // HighEnemy lazer listesi
 
     // Bolum basladiginda cagrilacak ilk ayarlar
     baslat: function (canvas) {
@@ -58,11 +60,12 @@ export const vegaBolumu = {
         this.firtinaAktif = false;
         this.firtinaHalkasi = 0;
         this.zincirler = [];
+        this.lazerler = [];
         this.koridorlariHazirla(canvas);
 
-        // Her koridordan ilk dusmanlar gelsin.
-        for (let i = 0; i < 5; i++) {
-            this.dusmanEkle(canvas, i, i * 110);
+        // Vega başlangıç: 3 koridor, aralıklı geliş
+        for (let i = 0; i < 3; i++) {
+            this.dusmanEkle(canvas, i * 2, i * 180); // 0, 2, 4 numaralı koridorlar
         }
 
         this.huduGuncelle();
@@ -72,6 +75,7 @@ export const vegaBolumu = {
         this.oyunDevamEdiyor = false;
         this.oyunBitti = false;
         this.dusmanlar = [];
+        this.lazerler = [];
         this.gecenSure = 0;
         this.yenidenDoluyor = false;
         this.huduGuncelle();
@@ -94,8 +98,16 @@ export const vegaBolumu = {
         if (!this.koridorlar[koridorNo]) return;
         const x = canvas.width + 60 + gecikme;
         const y = this.koridorlar[koridorNo].y;
-        // Vega istatistikleri
-        const dusman = new NormalEnemy(x, y, koridorNo, 0.70 + (koridorNo * 0.1), 32, 60);
+        // Vega'da karma düşman tipleri: %55 Normal, %35 High, %10 Queen
+        const rnd = Math.random();
+        let dusman;
+        if (rnd < 0.55) {
+            dusman = new NormalEnemy(x, y, koridorNo, 0.75 + (koridorNo * 0.08), 32, 60);
+        } else if (rnd < 0.90) {
+            dusman = new HighEnemy(x, y, koridorNo, 0.90 + (koridorNo * 0.05), 40, 100);
+        } else {
+            dusman = new QueenEnemy(x, y, koridorNo, 0.55, 80, 180);
+        }
         this.dusmanlar.push(dusman);
     },
 
@@ -132,6 +144,9 @@ export const vegaBolumu = {
         }
 
         this.mermi--;
+
+        const atisSesi = new Audio('audios/atis_sesi_anlik.mp3');
+        if (sfxAcik) atisSesi.play().catch(err => console.log("Ses çalınamadı:", err));
 
         if (this.mermi <= 0) {
             this.yenidenDoldur();
@@ -235,8 +250,10 @@ export const vegaBolumu = {
         }
 
         if (performance.now() - this.sonDusmanZamani > this.dusmanAraligi) {
-            for (let i = 0; i < 5; i++) {
-                this.dusmanEkle(canvas, i, i * 85);
+            // Her dalgada 3 düşman (5 yerine) — daha dengeli yoğunluk
+            for (let i = 0; i < 3; i++) {
+                const koridor = Math.floor(Math.random() * 5); // rastgele koridor
+                this.dusmanEkle(canvas, koridor, i * 150);
             }
 
             this.sonDusmanZamani = performance.now();
@@ -261,7 +278,12 @@ export const vegaBolumu = {
 
         for (let i = this.dusmanlar.length - 1; i >= 0; i--) {
             const dusman = this.dusmanlar[i];
-            dusman.y = this.koridorlar[dusman.koridorNo].y;
+
+            // Queen kendi Y'sini ışınlanmayla değiştirebilir; diğerleri koridora kilitli
+            if (!dusman.tip || dusman.tip !== 'queen') {
+                dusman.y = this.koridorlar[dusman.koridorNo] ? this.koridorlar[dusman.koridorNo].y : dusman.y;
+            }
+
             // Eğer fırtına aktifse düşmanlar hareket edemez
             if (!this.firtinaAktif) {
                 dusman.x -= dusman.hiz;
@@ -270,16 +292,49 @@ export const vegaBolumu = {
                 dusman.donmus = true;
             }
 
+            // Özel yetenekler (lazer atışı / ışınlanma / doğurma)
+            dusman.update(canvas, this);
+
             if (gemi && this.dusmanGemiyeDegdiMi(dusman, gemi)) {
-                this.oyuncuCan -= 20;
+                this.oyuncuCan -= (dusman.tip === 'queen' ? 60 : 20);
                 this.sonOyuncuHasarZamani = this.gecenSure;
                 this.dusmanlar.splice(i, 1);
                 continue;
             }
 
             if (dusman.x < savunmaX + 28) {
-                this.can -= 10;
+                this.can -= (dusman.tip === 'queen' ? 80 : 10);
                 this.dusmanlar.splice(i, 1);
+            }
+        }
+
+        // --- LAZER HAREKETİ VE ÇARPIŞMA ---
+        for (let i = this.lazerler.length - 1; i >= 0; i--) {
+            const lz = this.lazerler[i];
+            lz.x += lz.hizX;
+            lz.y += lz.hizY;
+
+            // Gemiye çarptı mı?
+            if (gemi) {
+                const gW = gemi.genislik / 2;
+                const gH = gemi.uzunluk / 2;
+                if (lz.x > gemi.x - gW && lz.x < gemi.x + gW &&
+                    lz.y > gemi.y - gH && lz.y < gemi.y + gH) {
+                    this.oyuncuCan -= lz.hasar;
+                    this.sonOyuncuHasarZamani = this.gecenSure;
+                    this.lazerler.splice(i, 1);
+                    continue;
+                }
+            }
+            // Üsse çarptı mı?
+            if (lz.x < savunmaX + 28) {
+                this.can -= lz.hasar;
+                this.lazerler.splice(i, 1);
+                continue;
+            }
+            // Ekrandan çıktı mı?
+            if (lz.x < 0 || lz.y < 0 || lz.y > canvas.height) {
+                this.lazerler.splice(i, 1);
             }
         }
 

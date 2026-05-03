@@ -3,6 +3,7 @@
 import { NormalEnemy } from './enemy.js';
 import { gemi } from './player.js';
 import { drawAstraStyleScene, enemyHitPlanet, moveEnemyToPlanet, randomTopSideSpawn } from './sceneVisuals.js';
+import { sfxAcik } from './audio.js';
 
 export const kronBolumu = {
     isim: 'Kron',
@@ -125,6 +126,10 @@ export const kronBolumu = {
     atesEtmeyeIzinVar: function () {
         if (!this.oyunDevamEdiyor || this.oyunBitti) return false;
         // Sınırsız mermi: Her zaman ateş edebilir, mermi azalmaz.
+        
+        const atisSesi = new Audio('audios/atis_sesi_anlik.mp3');
+        if (sfxAcik) atisSesi.play().catch(err => console.log("Ses çalınamadı:", err));
+
         this.huduGuncelle();
         return true;
     },
