@@ -1,10 +1,12 @@
 // --- NORA GEZEGENI (KARADELIK) BOLUM DOSYASI ---
 
 import { NormalEnemy, HighEnemy, QueenEnemy } from './enemy.js';
+import { drawSidePlanetScene } from './sceneVisuals.js';
 
 export const noraBolumu = {
     isim: 'Nora',
     renk: '#f39c12',
+    gezegenGorseli: 'assets/images/gezegen3.png',
     can: 150,
     maxCan: 150,
     oyuncuCan: 100,
@@ -359,7 +361,7 @@ export const noraBolumu = {
     },
 
     gezegenYaricapi: function (canvas) {
-        return Math.min(300, Math.max(180, canvas.height * 0.35));
+        return Math.min(175, Math.max(135, canvas.height * 0.22));
     },
 
     savunmaUssuX: function (canvas) {
@@ -379,6 +381,9 @@ export const noraBolumu = {
     },
 
     ciz: function (ctx, canvas) {
+        drawSidePlanetScene(ctx, canvas, this, this.gezegenGorseli);
+        return;
+
         const yariCap  = this.gezegenYaricapi(canvas);
         const merkezY  = canvas.height / 2;
         const savunmaX = this.savunmaUssuX(canvas);

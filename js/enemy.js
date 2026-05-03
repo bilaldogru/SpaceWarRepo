@@ -31,13 +31,12 @@ export class Enemy {
     draw(ctx) {
         const yari = this.boyut / 2;
         ctx.save();
-        if (this.image && this.image.complete && this.image.naturalWidth > 0) {
-            ctx.drawImage(this.image, this.x - yari, this.y - yari, this.boyut, this.boyut);
-        } else {
-            ctx.fillStyle = this.tip === 'queen' ? '#f39c12'
-                          : this.tip === 'high'  ? '#8e44ad' : '#ff4747';
-            ctx.fillRect(this.x - yari, this.y - yari, this.boyut, this.boyut);
-        }
+        ctx.fillStyle = this.tip === 'queen' ? '#f39c12'
+                      : this.tip === 'high'  ? '#8e44ad' : '#ff4747';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.fillRect(this.x - yari, this.y - yari, this.boyut, this.boyut);
+        ctx.strokeRect(this.x - yari, this.y - yari, this.boyut, this.boyut);
         ctx.restore();
     }
 }

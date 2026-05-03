@@ -1,10 +1,12 @@
 // --- ASTRA GEZEGENI BOLUM DOSYASI ---
 
 import { NormalEnemy } from './enemy.js';
+import { drawSidePlanetScene } from './sceneVisuals.js';
 
 export const astraBolumu = {
     isim: 'Astra',
     renk: '#e056fd',
+    gezegenGorseli: 'assets/images/gezegen1.png',
     can: 100,
     maxCan: 100,
     oyuncuCan: 100,
@@ -222,7 +224,7 @@ export const astraBolumu = {
     },
 
     gezegenYaricapi: function (canvas) {
-        return Math.min(330, Math.max(220, canvas.height * 0.38));
+        return Math.min(175, Math.max(135, canvas.height * 0.22));
     },
 
     savunmaUssuX: function (canvas) {
@@ -255,6 +257,9 @@ export const astraBolumu = {
 
     // Cizim islemi (Gezegenin yarisi, us ve dusmanlar)
     ciz: function (ctx, canvas) {
+        drawSidePlanetScene(ctx, canvas, this, this.gezegenGorseli);
+        return;
+
         const gezegenYaricapi = this.gezegenYaricapi(canvas);
         const merkezY = canvas.height / 2;
         const savunmaX = this.savunmaUssuX(canvas);

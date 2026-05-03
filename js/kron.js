@@ -2,16 +2,18 @@
 
 import { NormalEnemy } from './enemy.js';
 import { gemi } from './player.js';
+import { drawAstraStyleScene, enemyHitPlanet, moveEnemyToPlanet, randomTopSideSpawn } from './sceneVisuals.js';
 
 export const kronBolumu = {
     isim: 'Kron',
+    gezegenGorseli: 'assets/images/gezegen4.png',
     renk: '#55efc4', // Parlak Yeşil
     can: 100,
     maxCan: 100,
     oyuncuCan: 100,
     maxOyuncuCan: 100,
     turn: 1,
-    maxTurn: 5,
+    maxTurn: Infinity,
     mermi: Infinity, // Sınırsız mermi (Eğlence Modu)
     maxMermi: Infinity,
     para: 250,
@@ -24,6 +26,7 @@ export const kronBolumu = {
     yenidenDolumSuresi: 0, // Gerek yok ama yapıyı koruyalım
     oyunDevamEdiyor: false,
     oyunBitti: false,
+    enIyiSkorGuncellendi: false,
     sonOyuncuHasarZamani: -10,
     dusmanlar: [],
     koridorlar: [],
@@ -44,6 +47,7 @@ export const kronBolumu = {
         this.dusmanlar = [];
         this.oyunDevamEdiyor = true;
         this.oyunBitti = false;
+        this.enIyiSkorGuncellendi = false;
         this.sonOyuncuHasarZamani = -10;
         this.baslangicZamani = performance.now();
         this.sonDusmanZamani = performance.now();
@@ -84,9 +88,9 @@ export const kronBolumu = {
     },
 
     dusmanEkle: function (canvas, koridorNo, gecikme) {
-        if (!this.koridorlar[koridorNo]) return;
-        const x = canvas.width + 60 + gecikme;
-        const y = this.koridorlar[koridorNo].y;
+        const spawn = randomTopSideSpawn(canvas, 70 + gecikme);
+        const x = spawn.x;
+        const y = spawn.y;
         // Kron istatistikleri
         const dusman = new NormalEnemy(x, y, koridorNo, 0.80 + (koridorNo * 0.1), 32, 50);
         this.dusmanlar.push(dusman);
@@ -105,6 +109,7 @@ export const kronBolumu = {
         const hudPara = document.getElementById('hud-para');
         const hudSure = document.getElementById('hud-sure');
         const hudTurn = document.getElementById('hud-turn');
+        const hudMaxTurn = document.getElementById('hud-max-turn');
         const hudDusman = document.getElementById('hud-dusman');
 
         if (hudCan) hudCan.textContent = Math.max(0, Math.ceil(this.can));
@@ -113,6 +118,7 @@ export const kronBolumu = {
         if (hudPara) hudPara.textContent = this.para;
         if (hudSure) hudSure.textContent = this.sureyiYaz();
         if (hudTurn) hudTurn.textContent = this.turn;
+        if (hudMaxTurn) hudMaxTurn.textContent = '∞';
         if (hudDusman) hudDusman.textContent = this.dusmanlar.length;
     },
 
@@ -160,6 +166,7 @@ export const kronBolumu = {
 
         this.koridorlariHazirla(canvas);
         this.gecenSure = (performance.now() - this.baslangicZamani) / 1000;
+        this.turn = Math.floor(this.gecenSure / 30) + 1;
 
         if (performance.now() - this.sonDusmanZamani > this.dusmanAraligi) {
             for (let i = 0; i < 5; i++) {
@@ -168,12 +175,9 @@ export const kronBolumu = {
             this.sonDusmanZamani = performance.now();
         }
 
-        const savunmaX = this.savunmaUssuX(canvas);
-
         for (let i = this.dusmanlar.length - 1; i >= 0; i--) {
             const dusman = this.dusmanlar[i];
-            dusman.y = this.koridorlar[dusman.koridorNo].y;
-            dusman.x -= dusman.hiz;
+            moveEnemyToPlanet(dusman, canvas, this);
 
             if (gemi && this.dusmanGemiyeDegdiMi(dusman, gemi)) {
                 this.oyuncuCan -= 15;
@@ -182,7 +186,7 @@ export const kronBolumu = {
                 continue;
             }
 
-            if (dusman.x < savunmaX + 28) {
+            if (enemyHitPlanet(dusman, canvas, this)) {
                 this.can -= 8;
                 this.dusmanlar.splice(i, 1);
             }
@@ -200,13 +204,27 @@ export const kronBolumu = {
             this.oyuncuCan = Math.max(0, this.oyuncuCan);
             this.oyunDevamEdiyor = false;
             this.oyunBitti = true;
+            this.kronSkorunuKaydet();
         }
 
         this.huduGuncelle();
     },
 
+    kronSkorunuKaydet: function () {
+        if (this.enIyiSkorGuncellendi) return;
+        this.enIyiSkorGuncellendi = true;
+
+        const skor = Math.floor(this.gecenSure);
+        const oncekiSkor = Number(localStorage.getItem('spacewarKronBestTime') || 0);
+        if (skor > oncekiSkor) {
+            localStorage.setItem('spacewarKronBestTime', String(skor));
+        }
+
+        window.dispatchEvent(new CustomEvent('kron-skor-guncellendi'));
+    },
+
     gezegenYaricapi: function (canvas) {
-        return Math.min(330, Math.max(220, canvas.height * 0.38));
+        return Math.min(150, Math.max(90, canvas.height * 0.15));
     },
 
     savunmaUssuX: function (canvas) {
@@ -236,6 +254,9 @@ export const kronBolumu = {
     },
 
     ciz: function (ctx, canvas) {
+        drawAstraStyleScene(ctx, canvas, this, this.gezegenGorseli);
+        return;
+
         const gezegenYaricapi = this.gezegenYaricapi(canvas);
         const merkezY = canvas.height / 2;
         const savunmaX = this.savunmaUssuX(canvas);
@@ -353,10 +374,11 @@ export const kronBolumu = {
         ctx.textAlign = 'center';
         ctx.font = "700 54px 'Orbitron', sans-serif";
         ctx.fillStyle = '#ff4747';
-        ctx.fillText('MOD BITTI', canvas.width / 2, canvas.height / 2 - 18);
+        ctx.fillText('OLDUNUZ', canvas.width / 2, canvas.height / 2 - 34);
         ctx.font = "700 26px 'Rajdhani', sans-serif";
         ctx.fillStyle = '#ffffff';
-        ctx.fillText('Kron Eglence Modu Tamamlandi', canvas.width / 2, canvas.height / 2 + 34);
+        ctx.fillText(`Dayanilan sure: ${this.sureyiYaz()}`, canvas.width / 2, canvas.height / 2 + 18);
+        ctx.fillText('Menuye donerek en iyi skoru gezegen altinda gorebilirsiniz', canvas.width / 2, canvas.height / 2 + 56);
         ctx.restore();
     }
 };
