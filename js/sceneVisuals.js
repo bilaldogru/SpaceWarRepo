@@ -96,15 +96,16 @@ export function randomEdgeSpawn(canvas, margin = 70) {
 
 export function randomTopSideSpawn(canvas, margin = 70) {
     const edge = Math.floor(Math.random() * 3);
+    const sideY = Math.random() * Math.max(1, canvas.height - 280) + 120;
 
     if (edge === 0) {
         return { x: Math.random() * canvas.width, y: -margin };
     }
     if (edge === 1) {
-        return { x: canvas.width + margin, y: Math.random() * canvas.height };
+        return { x: canvas.width + margin, y: sideY };
     }
 
-    return { x: -margin, y: Math.random() * canvas.height };
+    return { x: -margin, y: sideY };
 }
 
 export function moveEnemyToPlanet(enemy, canvas, bolum) {
@@ -127,44 +128,61 @@ export function enemyHitPlanet(enemy, canvas, bolum) {
 }
 
 export function drawSquareEnemy(ctx, enemy, color) {
-    const half = enemy.boyut / 2;
-
-    ctx.save();
-    ctx.fillStyle = color;
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2;
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = color;
-    ctx.fillRect(enemy.x - half, enemy.y - half, enemy.boyut, enemy.boyut);
-    ctx.shadowBlur = 0;
-    ctx.strokeRect(enemy.x - half, enemy.y - half, enemy.boyut, enemy.boyut);
+    if (typeof enemy.draw === 'function') {
+        enemy.draw(ctx);
+    } else {
+        const half = enemy.boyut / 2;
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.fillRect(enemy.x - half, enemy.y - half, enemy.boyut, enemy.boyut);
+        ctx.restore();
+    }
 
     if (enemy.donmus) {
+        const half = enemy.boyut / 2;
+        ctx.save();
         ctx.strokeStyle = '#5ae0ff';
         ctx.lineWidth = 3;
         ctx.strokeRect(enemy.x - half - 5, enemy.y - half - 5, enemy.boyut + 10, enemy.boyut + 10);
+        ctx.restore();
     }
-
-    ctx.restore();
 }
 
 export function drawSquareEnemies(ctx, enemies, drawHealthBar) {
     enemies.forEach(enemy => {
-        const color = enemy.tip === 'queen' ? '#f39c12'
-            : enemy.tip === 'high' ? '#8e44ad'
+        const color = enemy.tip === '5' ? '#f39c12'
+            : enemy.tip === '4' ? '#e67e22'
+            : enemy.tip === '3' ? '#5ae0ff'
+            : enemy.tip === '2' ? '#8e44ad'
             : '#ff4747';
 
         drawSquareEnemy(ctx, enemy, color);
 
         const half = enemy.boyut / 2;
-        const barWidth = enemy.tip === 'queen' ? 70 : 40;
-        const barX = enemy.tip === 'queen' ? 35 : 20;
+        const barWidth = enemy.tip === '5' || enemy.tip === '4' ? 70 : 40;
+        const barX = enemy.tip === '5' || enemy.tip === '4' ? 35 : 20;
         drawHealthBar(ctx, enemy.x - barX, enemy.y - half - 12, barWidth, 5, enemy.can, enemy.maxCan);
+    });
+}
+
+export function drawEnemyLasers(ctx, lasers = []) {
+    lasers.forEach(laser => {
+        ctx.save();
+        ctx.strokeStyle = '#ff5ef7';
+        ctx.lineWidth = 3;
+        ctx.shadowBlur = 14;
+        ctx.shadowColor = '#ff5ef7';
+        ctx.beginPath();
+        ctx.moveTo(laser.x, laser.y);
+        ctx.lineTo(laser.x - laser.hizX * 4, laser.y - laser.hizY * 4);
+        ctx.stroke();
+        ctx.restore();
     });
 }
 
 export function drawAstraStyleScene(ctx, canvas, bolum, assetSrc) {
     drawPlanetAsset(ctx, canvas, bolum, assetSrc);
+    drawEnemyLasers(ctx, bolum.lazerler);
     drawSquareEnemies(ctx, bolum.dusmanlar, bolum.canBariCiz.bind(bolum));
 }
 
@@ -176,5 +194,6 @@ export function drawSidePlanetScene(ctx, canvas, bolum, assetSrc) {
     const image = getPlanetImage(assetSrc);
 
     drawPlanetImageAt(ctx, centerX, centerY, radius, color, image);
+    drawEnemyLasers(ctx, bolum.lazerler);
     drawSquareEnemies(ctx, bolum.dusmanlar, bolum.canBariCiz.bind(bolum));
 }

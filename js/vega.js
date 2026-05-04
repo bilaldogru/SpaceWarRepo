@@ -1,8 +1,7 @@
 // --- VEGA GEZEGENI BOLUM DOSYASI ---
 
-import { NormalEnemy, HighEnemy, QueenEnemy } from './enemy.js';
+import { dusmanOlustur, dusmanTipiSec } from './enemy.js';
 import { drawSidePlanetScene } from './sceneVisuals.js';
-import { sfxAcik } from './audio.js';
 
 export const vegaBolumu = {
     isim: 'Vega',
@@ -38,7 +37,12 @@ export const vegaBolumu = {
     firtinaAktif: false,
     firtinaHalkasi: 0,
     zincirler: [],        // Görsel efektler için
-    lazerler: [],         // HighEnemy lazer listesi
+    lazerler: [],         // Ates eden dusmanlarin lazer listesi
+    dusmanDagilimi: [
+        { tip: '1', agirlik: 45 },
+        { tip: '2', agirlik: 35 },
+        { tip: '3', agirlik: 20 }
+    ],
 
     // Bolum basladiginda cagrilacak ilk ayarlar
     baslat: function (canvas) {
@@ -99,15 +103,9 @@ export const vegaBolumu = {
         const x = canvas.width + 60 + gecikme;
         const y = this.koridorlar[koridorNo].y;
         // Vega'da karma düşman tipleri: %55 Normal, %35 High, %10 Queen
-        const rnd = Math.random();
-        let dusman;
-        if (rnd < 0.55) {
-            dusman = new NormalEnemy(x, y, koridorNo, 0.75 + (koridorNo * 0.08), 32, 60);
-        } else if (rnd < 0.90) {
-            dusman = new HighEnemy(x, y, koridorNo, 0.90 + (koridorNo * 0.05), 40, 100);
-        } else {
-            dusman = new QueenEnemy(x, y, koridorNo, 0.55, 80, 180);
-        }
+        const tip = dusmanTipiSec(this.dusmanDagilimi);
+        const dusman = dusmanOlustur(tip, x, y, koridorNo);
+        dusman.hiz += koridorNo * 0.03;
         this.dusmanlar.push(dusman);
     },
 
@@ -144,9 +142,6 @@ export const vegaBolumu = {
         }
 
         this.mermi--;
-
-        const atisSesi = new Audio('audios/atis_sesi_anlik.mp3');
-        if (sfxAcik) atisSesi.play().catch(err => console.log("Ses çalınamadı:", err));
 
         if (this.mermi <= 0) {
             this.yenidenDoldur();
@@ -243,6 +238,7 @@ export const vegaBolumu = {
 
         this.koridorlariHazirla(canvas);
         this.gecenSure = (performance.now() - this.baslangicZamani) / 1000;
+        this._gemi = gemi;
 
         if (this.yenidenDoluyor && performance.now() - this.yenidenDolumBaslangic >= this.yenidenDolumSuresi) {
             this.mermi = this.maxMermi;
@@ -280,7 +276,7 @@ export const vegaBolumu = {
             const dusman = this.dusmanlar[i];
 
             // Queen kendi Y'sini ışınlanmayla değiştirebilir; diğerleri koridora kilitli
-            if (!dusman.tip || dusman.tip !== 'queen') {
+            if (!dusman.tip || dusman.tip !== '3') {
                 dusman.y = this.koridorlar[dusman.koridorNo] ? this.koridorlar[dusman.koridorNo].y : dusman.y;
             }
 
@@ -296,14 +292,14 @@ export const vegaBolumu = {
             dusman.update(canvas, this);
 
             if (gemi && this.dusmanGemiyeDegdiMi(dusman, gemi)) {
-                this.oyuncuCan -= (dusman.tip === 'queen' ? 60 : 20);
+                this.oyuncuCan -= (dusman.tip === '3' ? 28 : (dusman.tip === '2' ? 24 : 18));
                 this.sonOyuncuHasarZamani = this.gecenSure;
                 this.dusmanlar.splice(i, 1);
                 continue;
             }
 
             if (dusman.x < savunmaX + 28) {
-                this.can -= (dusman.tip === 'queen' ? 80 : 10);
+                this.can -= (dusman.tip === '3' ? 18 : (dusman.tip === '2' ? 14 : 10));
                 this.dusmanlar.splice(i, 1);
             }
         }

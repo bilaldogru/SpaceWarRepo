@@ -1,8 +1,8 @@
 // --- NORA GEZEGENI (KARADELIK) BOLUM DOSYASI ---
 
-import { NormalEnemy, HighEnemy, QueenEnemy } from './enemy.js';
+import { dusmanOlustur, dusmanTipiSec } from './enemy.js';
 import { drawSidePlanetScene } from './sceneVisuals.js';
-import { muzikAksiyon, muzikDurdurTum, sfxAcik } from './audio.js';
+import { muzikAksiyon, muzikDurdurTum } from './audio.js';
 
 export const noraBolumu = {
     isim: 'Nora',
@@ -47,6 +47,12 @@ export const noraBolumu = {
     lazerler: [],
     dusmanlar: [],
     koridorlar: [],
+    dusmanDagilimi: [
+        { tip: '1', agirlik: 34 },
+        { tip: '2', agirlik: 28 },
+        { tip: '3', agirlik: 22 },
+        { tip: '4', agirlik: 16 }
+    ],
     _gemi: null,
     sonOyuncuHasarZamani: -10, // Son hasar zamanı (gecenSure cinsinden)
 
@@ -103,18 +109,13 @@ export const noraBolumu = {
         }
     },
 
-    dusmanEkle: function (canvas, koridorNo, gecikme, tip = 'normal') {
+    dusmanEkle: function (canvas, koridorNo, gecikme, tip = null) {
         if (!this.koridorlar[koridorNo]) return;
         const x = canvas.width + gecikme;
         const y = this.koridorlar[koridorNo].y;
-        let dusman;
-        if (tip === 'queen') {
-            dusman = new QueenEnemy(x, y, koridorNo, 0.50, 90, 200);
-        } else if (tip === 'high') {
-            dusman = new HighEnemy(x, y, koridorNo, 1.0 + (koridorNo * 0.05), 45, 100);
-        } else {
-            dusman = new NormalEnemy(x, y, koridorNo, 0.75 + (koridorNo * 0.05), 32, 10);
-        }
+        const secilenTip = tip || dusmanTipiSec(this.dusmanDagilimi);
+        const dusman = dusmanOlustur(secilenTip, x, y, koridorNo);
+        dusman.hiz += koridorNo * 0.02;
         this.dusmanlar.push(dusman);
     },
 
@@ -146,9 +147,6 @@ export const noraBolumu = {
         if (this.mermi <= 0) { this.yenidenDoldur(); return false; }
         this.mermi--;
 
-        const atisSesi = new Audio('audios/atis_sesi_anlik.mp3');
-        if (sfxAcik) atisSesi.play().catch(err => console.log("Ses çalınamadı:", err));
-
         if (this.mermi <= 0) this.yenidenDoldur();
         this.huduGuncelle();
         return true;
@@ -172,7 +170,7 @@ export const noraBolumu = {
                     d.can -= 25;
                     mermiler.splice(i, 1);
                     if (d.can <= 0) {
-                        this.para += (d.tip === 'queen' ? 300 : (d.tip === 'high' ? 40 : 15));
+                        this.para += this.dusmanOdulu(d);
                         this.dusmanlar.splice(j, 1);
                     }
                     break;
@@ -181,29 +179,50 @@ export const noraBolumu = {
         }
     },
 
+    dusmanOdulu: function (dusman) {
+        if (dusman.tip === '4') return 80;
+        if (dusman.tip === '3') return 35;
+        if (dusman.tip === '2') return 40;
+        return 15;
+    },
+
+    dusmanTemasHasari: function (dusman) {
+        if (dusman.tip === '4') return 60;
+        if (dusman.tip === '3') return 35;
+        if (dusman.tip === '2') return 30;
+        return 24;
+    },
+
+    dusmanGezegenHasari: function (dusman) {
+        if (dusman.tip === '4') return 80;
+        if (dusman.tip === '3') return 25;
+        if (dusman.tip === '2') return 22;
+        return 16;
+    },
+
     _dalgaTanimlari: function () {
         return [
             // Dalga 1: Hafif — sadece normal
-            [...Array(8)].map((_, i) => ({ koridor: i % 5, tip: 'normal', gecikme: i * 600 })),
+            [...Array(8)].map((_, i) => ({ koridor: i % 5, tip: '1', gecikme: i * 600 })),
             // Dalga 2: Orta — normal + bazı high
-            [...Array(10)].map((_, i) => ({ koridor: i % 5, tip: i % 3 === 0 ? 'high' : 'normal', gecikme: i * 500 })),
+            [...Array(10)].map((_, i) => ({ koridor: i % 5, tip: i % 3 === 0 ? '2' : '1', gecikme: i * 500 })),
             // Dalga 3: Ağır — çoğunlukla high + 1 queen
             [
-                ...[...Array(8)].map((_, i) => ({ koridor: i % 5, tip: 'high', gecikme: i * 450 })),
-                { koridor: 2, tip: 'queen', gecikme: 5000 }
+                ...[...Array(8)].map((_, i) => ({ koridor: i % 5, tip: i % 2 === 0 ? '2' : '3', gecikme: i * 450 })),
+                { koridor: 2, tip: '4', gecikme: 5000 }
             ],
             // Dalga 4: Yoğun — karışık + 2 queen
             [
-                ...[...Array(10)].map((_, i) => ({ koridor: i % 5, tip: i % 2 === 0 ? 'high' : 'normal', gecikme: i * 400 })),
-                { koridor: 1, tip: 'queen', gecikme: 5500 },
-                { koridor: 3, tip: 'queen', gecikme: 7000 }
+                ...[...Array(10)].map((_, i) => ({ koridor: i % 5, tip: ['1', '2', '3'][i % 3], gecikme: i * 400 })),
+                { koridor: 1, tip: '4', gecikme: 5500 },
+                { koridor: 3, tip: '4', gecikme: 7000 }
             ],
             // Dalga 5: Cehennem — tüm high + 3 queen
             [
-                ...[...Array(12)].map((_, i) => ({ koridor: i % 5, tip: 'high', gecikme: i * 350 })),
-                { koridor: 0, tip: 'queen', gecikme: 5000 },
-                { koridor: 2, tip: 'queen', gecikme: 6500 },
-                { koridor: 4, tip: 'queen', gecikme: 8000 }
+                ...[...Array(12)].map((_, i) => ({ koridor: i % 5, tip: ['2', '3', '4'][i % 3], gecikme: i * 350 })),
+                { koridor: 0, tip: '4', gecikme: 5000 },
+                { koridor: 2, tip: '4', gecikme: 6500 },
+                { koridor: 4, tip: '4', gecikme: 8000 }
             ]
         ];
     },
@@ -273,7 +292,7 @@ export const noraBolumu = {
             const d = this.dusmanlar[i];
 
             // Queen kendi Y'sini ışınlanmayla değiştiriyor; diğerleri koridora kilitli
-            if (d.tip !== 'queen') {
+            if (d.tip !== '3') {
                 d.y = this.koridorlar[d.koridorNo] ? this.koridorlar[d.koridorNo].y : d.y;
             }
 
@@ -286,7 +305,7 @@ export const noraBolumu = {
 
             // Gemiye çarptı mı?
             if (gemi && this.dusmanGemiyeDegdiMi(d, gemi)) {
-                this.oyuncuCan -= (d.tip === 'queen' ? 70 : 30);
+                this.oyuncuCan -= this.dusmanTemasHasari(d);
                 this.sonOyuncuHasarZamani = this.gecenSure; // Hasar sayacını sıfırla
                 this.dusmanlar.splice(i, 1);
                 continue;
@@ -295,7 +314,7 @@ export const noraBolumu = {
             // Üsse ulaştı mı?
             if (d.x < savunmaX + 28) {
                 if (!this.kalkanAktif) {
-                    this.can -= (d.tip === 'queen' ? 100 : 20);
+                    this.can -= this.dusmanGezegenHasari(d);
                 }
                 this.dusmanlar.splice(i, 1);
             }
@@ -470,8 +489,8 @@ export const noraBolumu = {
             d.draw(ctx);
             ctx.restore();
             // Can barı
-            const bw = d.tip === 'queen' ? 70 : 40;
-            const bx = d.tip === 'queen' ? 35 : 20;
+            const bw = d.tip === '4' ? 70 : 40;
+            const bx = d.tip === '4' ? 35 : 20;
             this.canBariCiz(ctx, d.x - bx, d.y - yari - 12, bw, 5, d.can, d.maxCan);
         });
 

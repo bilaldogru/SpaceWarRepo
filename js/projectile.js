@@ -1,9 +1,13 @@
 // Uzay gemimize ait mermilerin tanımlanması
+import { atisSesiCal } from './audio.js';
+
 export const mermiler = [];
 const mermiHizi = 10;
 
 // Mermi atma fonksiyonu
 export function mermiAtesle(gemi) {
+    atisSesiCal();
+
     // merminin çapraz atış için açısının hesaplanması.
     const hizX = Math.cos(gemi.aci) * mermiHizi;
     const hizY = Math.sin(gemi.aci) * mermiHizi;

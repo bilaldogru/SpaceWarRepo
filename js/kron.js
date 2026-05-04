@@ -1,9 +1,8 @@
 // --- KRON GEZEGENI (EĞLENCE MODU) BOLUM DOSYASI ---
 
-import { NormalEnemy } from './enemy.js';
+import { dusmanOlustur, dusmanTipiSec } from './enemy.js';
 import { gemi } from './player.js';
 import { drawAstraStyleScene, enemyHitPlanet, moveEnemyToPlanet, randomTopSideSpawn } from './sceneVisuals.js';
-import { sfxAcik } from './audio.js';
 
 export const kronBolumu = {
     isim: 'Kron',
@@ -29,8 +28,17 @@ export const kronBolumu = {
     oyunBitti: false,
     enIyiSkorGuncellendi: false,
     sonOyuncuHasarZamani: -10,
+    serbestHareketModu: true,
     dusmanlar: [],
+    lazerler: [],
     koridorlar: [],
+    dusmanDagilimi: [
+        { tip: '1', agirlik: 34 },
+        { tip: '2', agirlik: 24 },
+        { tip: '3', agirlik: 20 },
+        { tip: '4', agirlik: 14 },
+        { tip: '5', agirlik: 8 }
+    ],
 
     // Bolum basladiginda cagrilacak ilk ayarlar
     baslat: function (canvas) {
@@ -46,6 +54,7 @@ export const kronBolumu = {
         this.gecenSure = 0;
         this.yenidenDoluyor = false;
         this.dusmanlar = [];
+        this.lazerler = [];
         this.oyunDevamEdiyor = true;
         this.oyunBitti = false;
         this.enIyiSkorGuncellendi = false;
@@ -70,6 +79,7 @@ export const kronBolumu = {
         this.oyunDevamEdiyor = false;
         this.oyunBitti = false;
         this.dusmanlar = [];
+        this.lazerler = [];
         this.gecenSure = 0;
         this.yenidenDoluyor = false;
         this.huduGuncelle();
@@ -92,8 +102,9 @@ export const kronBolumu = {
         const spawn = randomTopSideSpawn(canvas, 70 + gecikme);
         const x = spawn.x;
         const y = spawn.y;
-        // Kron istatistikleri
-        const dusman = new NormalEnemy(x, y, koridorNo, 0.80 + (koridorNo * 0.1), 32, 50);
+        const tip = dusmanTipiSec(this.dusmanDagilimi);
+        const dusman = dusmanOlustur(tip, x, y, koridorNo);
+        dusman.hiz += Math.min(0.35, this.turn * 0.02);
         this.dusmanlar.push(dusman);
     },
 
@@ -127,9 +138,6 @@ export const kronBolumu = {
         if (!this.oyunDevamEdiyor || this.oyunBitti) return false;
         // Sınırsız mermi: Her zaman ateş edebilir, mermi azalmaz.
         
-        const atisSesi = new Audio('audios/atis_sesi_anlik.mp3');
-        if (sfxAcik) atisSesi.play().catch(err => console.log("Ses çalınamadı:", err));
-
         this.huduGuncelle();
         return true;
     },
@@ -157,7 +165,7 @@ export const kronBolumu = {
 
                     if (dusman.can <= 0) {
                         this.dusmanlar.splice(j, 1);
-                        this.para += 15;
+                        this.para += this.dusmanOdulu(dusman);
                     }
 
                     break;
@@ -166,12 +174,37 @@ export const kronBolumu = {
         }
     },
 
+    dusmanOdulu: function (dusman) {
+        if (dusman.tip === '5') return 110;
+        if (dusman.tip === '4') return 75;
+        if (dusman.tip === '3') return 35;
+        if (dusman.tip === '2') return 35;
+        return 15;
+    },
+
+    dusmanTemasHasari: function (dusman) {
+        if (dusman.tip === '5') return 42;
+        if (dusman.tip === '4') return 34;
+        if (dusman.tip === '3') return 22;
+        if (dusman.tip === '2') return 20;
+        return 15;
+    },
+
+    dusmanGezegenHasari: function (dusman) {
+        if (dusman.tip === '5') return 35;
+        if (dusman.tip === '4') return 24;
+        if (dusman.tip === '3') return 12;
+        if (dusman.tip === '2') return 12;
+        return 8;
+    },
+
     guncelle: function (canvas, mermiler, gemi) {
         if (!this.oyunDevamEdiyor) return;
 
         this.koridorlariHazirla(canvas);
         this.gecenSure = (performance.now() - this.baslangicZamani) / 1000;
         this.turn = Math.floor(this.gecenSure / 30) + 1;
+        this._gemi = gemi;
 
         if (performance.now() - this.sonDusmanZamani > this.dusmanAraligi) {
             for (let i = 0; i < 5; i++) {
@@ -183,17 +216,47 @@ export const kronBolumu = {
         for (let i = this.dusmanlar.length - 1; i >= 0; i--) {
             const dusman = this.dusmanlar[i];
             moveEnemyToPlanet(dusman, canvas, this);
+            dusman.update(canvas, this);
 
             if (gemi && this.dusmanGemiyeDegdiMi(dusman, gemi)) {
-                this.oyuncuCan -= 15;
+                this.oyuncuCan -= this.dusmanTemasHasari(dusman);
                 this.sonOyuncuHasarZamani = this.gecenSure;
                 this.dusmanlar.splice(i, 1);
                 continue;
             }
 
             if (enemyHitPlanet(dusman, canvas, this)) {
-                this.can -= 8;
+                this.can -= this.dusmanGezegenHasari(dusman);
                 this.dusmanlar.splice(i, 1);
+            }
+        }
+
+        for (let i = this.lazerler.length - 1; i >= 0; i--) {
+            const lazer = this.lazerler[i];
+            lazer.x += lazer.hizX;
+            lazer.y += lazer.hizY;
+
+            if (gemi) {
+                const gx = gemi.genislik / 2;
+                const gy = gemi.uzunluk / 2;
+                if (lazer.x > gemi.x - gx && lazer.x < gemi.x + gx &&
+                    lazer.y > gemi.y - gy && lazer.y < gemi.y + gy) {
+                    this.oyuncuCan -= lazer.hasar;
+                    this.sonOyuncuHasarZamani = this.gecenSure;
+                    this.lazerler.splice(i, 1);
+                    continue;
+                }
+            }
+
+            if (enemyHitPlanet({ x: lazer.x, y: lazer.y, boyut: 8 }, canvas, this)) {
+                this.can -= lazer.hasar;
+                this.lazerler.splice(i, 1);
+                continue;
+            }
+
+            if (lazer.x < -120 || lazer.x > canvas.width + 120 ||
+                lazer.y < -120 || lazer.y > canvas.height + 120) {
+                this.lazerler.splice(i, 1);
             }
         }
 

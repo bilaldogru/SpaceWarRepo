@@ -67,6 +67,7 @@ export function bolumleriBaslat() {
     const gezegenHaritasi = document.querySelector('.gezegen-haritasi');
     const secimBaslik = document.querySelector('.secim-baslik');
     const oyunHud = document.getElementById('oyun-hud');
+    const sesKontrolleri = document.getElementById('ses-kontrolleri');
     const canvas = document.getElementById('yildiz-alani');
     const hudMenuBtn = document.getElementById('hud-ana-menu-btn');
     const hudMaxTurn = document.getElementById('hud-max-turn');
@@ -149,6 +150,7 @@ export function bolumleriBaslat() {
         if (gezegenHaritasi) gezegenHaritasi.style.display = 'none';
         if (secimBaslik) secimBaslik.style.display = 'none';
         if (oyunHud) oyunHud.style.display = 'flex';
+        if (sesKontrolleri) sesKontrolleri.style.display = 'none';
 
         canvas.style.backgroundColor = ayar.arkaPlan;
         canvas.style.boxShadow = `inset 0 0 150px ${aktifBolum.renk}`;
@@ -190,6 +192,7 @@ export function bolumleriBaslat() {
         if (secimBaslik) secimBaslik.style.display = 'block';
         if (oyunAlani) oyunAlani.style.display = 'none';
         if (anaMenu) anaMenu.style.display = 'flex';
+        if (sesKontrolleri) sesKontrolleri.style.display = 'flex';
 
         canvas.style.backgroundColor = 'black';
         canvas.style.boxShadow = 'none';

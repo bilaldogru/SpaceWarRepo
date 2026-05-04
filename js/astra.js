@@ -1,8 +1,7 @@
 // --- ASTRA GEZEGENI BOLUM DOSYASI ---
 
-import { NormalEnemy } from './enemy.js';
+import { dusmanOlustur, dusmanTipiSec } from './enemy.js';
 import { drawSidePlanetScene } from './sceneVisuals.js';
-import { sfxAcik } from './audio.js';
 
 export const astraBolumu = {
     isim: 'Astra',
@@ -28,7 +27,12 @@ export const astraBolumu = {
     oyunBitti: false,
     sonOyuncuHasarZamani: -10,
     dusmanlar: [],
+    lazerler: [],
     koridorlar: [],
+    dusmanDagilimi: [
+        { tip: '1', agirlik: 70 },
+        { tip: '2', agirlik: 30 }
+    ],
 
     // Bolum basladiginda cagrilacak ilk ayarlar
     baslat: function (canvas) {
@@ -40,6 +44,7 @@ export const astraBolumu = {
         this.gecenSure = 0;
         this.yenidenDoluyor = false;
         this.dusmanlar = [];
+        this.lazerler = [];
         this.oyunDevamEdiyor = true;
         this.oyunBitti = false;
         this.sonOyuncuHasarZamani = -10;
@@ -59,6 +64,7 @@ export const astraBolumu = {
         this.oyunDevamEdiyor = false;
         this.oyunBitti = false;
         this.dusmanlar = [];
+        this.lazerler = [];
         this.gecenSure = 0;
         this.yenidenDoluyor = false;
         this.huduGuncelle();
@@ -82,7 +88,9 @@ export const astraBolumu = {
         const x = canvas.width + 60 + gecikme;
         const y = this.koridorlar[koridorNo].y;
         // Astra'da sadece Normal (kamikaze) düşmanlar var; istatistikler astra'ya özel
-        const dusman = new NormalEnemy(x, y, koridorNo, 0.65 + (koridorNo * 0.08), 32, 60);
+        const tip = dusmanTipiSec(this.dusmanDagilimi);
+        const dusman = dusmanOlustur(tip, x, y, koridorNo);
+        dusman.hiz += koridorNo * 0.04;
         this.dusmanlar.push(dusman);
     },
 
@@ -119,9 +127,6 @@ export const astraBolumu = {
         }
 
         this.mermi--;
-
-        const atisSesi = new Audio('audios/atis_sesi_anlik.mp3');
-        if (sfxAcik) atisSesi.play().catch(err => console.log("Ses çalınamadı:", err));
 
         if (this.mermi <= 0) {
             this.yenidenDoldur();
@@ -189,11 +194,13 @@ export const astraBolumu = {
         }
 
         const savunmaX = this.savunmaUssuX(canvas);
+        this._gemi = gemi;
 
         for (let i = this.dusmanlar.length - 1; i >= 0; i--) {
             const dusman = this.dusmanlar[i];
             dusman.y = this.koridorlar[dusman.koridorNo].y;
             dusman.x -= dusman.hiz;
+            dusman.update(canvas, this);
 
             if (gemi && this.dusmanGemiyeDegdiMi(dusman, gemi)) {
                 this.oyuncuCan -= 20;
@@ -205,6 +212,34 @@ export const astraBolumu = {
             if (dusman.x < savunmaX + 28) {
                 this.can -= 10;
                 this.dusmanlar.splice(i, 1);
+            }
+        }
+
+        for (let i = this.lazerler.length - 1; i >= 0; i--) {
+            const lazer = this.lazerler[i];
+            lazer.x += lazer.hizX;
+            lazer.y += lazer.hizY;
+
+            if (gemi) {
+                const gx = gemi.genislik / 2;
+                const gy = gemi.uzunluk / 2;
+                if (lazer.x > gemi.x - gx && lazer.x < gemi.x + gx &&
+                    lazer.y > gemi.y - gy && lazer.y < gemi.y + gy) {
+                    this.oyuncuCan -= lazer.hasar;
+                    this.sonOyuncuHasarZamani = this.gecenSure;
+                    this.lazerler.splice(i, 1);
+                    continue;
+                }
+            }
+
+            if (lazer.x < savunmaX + 28) {
+                this.can -= lazer.hasar;
+                this.lazerler.splice(i, 1);
+                continue;
+            }
+
+            if (lazer.x < 0 || lazer.y < 0 || lazer.y > canvas.height || lazer.x > canvas.width + 120) {
+                this.lazerler.splice(i, 1);
             }
         }
 

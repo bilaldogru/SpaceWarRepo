@@ -8,6 +8,7 @@ export function arayuzuBaslat() {
     const anaMenu = document.getElementById('ana-menu');
     const oyunAlani = document.getElementById('oyun-alani');
     const hakkindaAlani = document.getElementById('hakkinda-alani');
+    const sesKontrolleri = document.getElementById('ses-kontrolleri');
 
     const baslaBtn = document.getElementById('basla-btn');
     const hakkindaBtn = document.getElementById('hakkinda-btn');
@@ -24,11 +25,18 @@ export function arayuzuBaslat() {
 
     document.addEventListener('click', playBaslangic, { once: true });
 
+    function sesKontrolleriniGoster(goster) {
+        if (sesKontrolleri) sesKontrolleri.style.display = goster ? 'flex' : 'none';
+    }
+
+    sesKontrolleriniGoster(true);
+
     // yeni bir ekran açıldığında mevcut ekranların gizlenmesini sağlanır.
     function tumEkranlariGizle() {
         if (anaMenu) anaMenu.style.display = 'none';
         if (oyunAlani) oyunAlani.style.display = 'none';
         if (hakkindaAlani) hakkindaAlani.style.display = 'none';
+        sesKontrolleriniGoster(false);
     }
 
     // butonların çalışması sağlanır.
@@ -37,6 +45,7 @@ export function arayuzuBaslat() {
     baslaBtn?.addEventListener('click', () => {
         tumEkranlariGizle();
         oyunAlani.style.display = 'flex';
+        sesKontrolleriniGoster(true);
         playBaslangic();
     });
 
@@ -44,6 +53,7 @@ export function arayuzuBaslat() {
     hakkindaBtn?.addEventListener('click', () => {
         tumEkranlariGizle();
         hakkindaAlani.style.display = 'flex';
+        sesKontrolleriniGoster(false);
         playBaslangic();
 
         // Hikayeyi dış dosyadan çekme
@@ -71,6 +81,7 @@ export function arayuzuBaslat() {
     hakkindaGeriBtn?.addEventListener('click', () => {
         tumEkranlariGizle();
         anaMenu.style.display = 'flex';
+        sesKontrolleriniGoster(true);
         playBaslangic();
     });
 }
