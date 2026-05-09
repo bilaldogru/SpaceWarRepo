@@ -58,8 +58,8 @@
                     <h2 class="panel-baslik"
                         style="font-size: 55px; margin-bottom: 5px; text-shadow: 0 0 20px #5ae0ff;">Gezegen Sec</h2>
                     <p class="panel-metin"
-                        style="font-size: 20px; color: #a0aabf; margin-bottom: 0; text-shadow: none;">Savunma haritasini
-                        secmek icin bir gezegene tikla</p>
+                        style="font-size: 20px; color: #a0aabf; margin-bottom: 0; text-shadow: none;">Moduler savas
+                        arenasini secmek icin bir gezegene tikla</p>
                 </div>
 
                 <!-- Gezegen 1: Astra (SOL ÜST KÖŞE) -->
@@ -108,10 +108,10 @@
             <!-- OYUN İÇİ ARAYÜZ (HUD) - Başlangıçta Gizli -->
             <div id="oyun-hud" class="oyun-hud" style="display: none;">
 
-                <!-- Üst Bar: Taretler ve Statlar -->
+                <!-- Ust Bar: Moduller ve Statlar -->
                 <div class="hud-ust-bar">
 
-                    <!-- Taret Slotları (5 Tane) -->
+                    <!-- Modul Slotlari (5 Tane) -->
                     <div class="hud-taret-panel">
                         <div class="taret-slot"><span class="taret-numara">1</span></div>
                         <div class="taret-slot"><span class="taret-numara">2</span></div>
@@ -122,10 +122,10 @@
 
                     <!-- Oyuncu Statları -->
                     <div class="hud-stat-panel">
-                        <div class="hud-stat-kutu">Us Can: <span id="hud-can">100</span></div>
-                        <div class="hud-stat-kutu">Gemi Can: <span id="hud-oyuncu-can">100</span></div>
-                        <div class="hud-stat-kutu">Para: <span id="hud-para">200</span></div>
-                        <div class="hud-stat-kutu">Mermi: <span id="hud-mermi">15</span></div>
+                        <div class="hud-stat-kutu">Cekirdek: <span id="hud-can">100</span></div>
+                        <div class="hud-stat-kutu">Modul: <span id="hud-oyuncu-can">1/4</span></div>
+                        <div class="hud-stat-kutu">Skor: <span id="hud-para">0</span></div>
+                        <div class="hud-stat-kutu">Mermi: <span id="hud-mermi">20/20</span></div>
                     </div>
 
                     <!-- Ana Menüye Dönüş -->
@@ -135,6 +135,13 @@
                 <!-- Alt Bilgi Barı: Süre ve Turn -->
                 <div class="hud-alt-bar">
                     <div>Gecen Sure: <span id="hud-sure">00:00</span></div>
+                    <div class="hud-dusman-sayaci" aria-label="Kalan dusman sayaci">
+                        <span>Kalan Dusman</span>
+                        <div class="hud-dusman-iz">
+                            <div id="hud-dusman-bar" class="hud-dusman-bar"></div>
+                        </div>
+                        <strong id="hud-dusman-kalan">0/0</strong>
+                    </div>
                     <div>Turn: <span id="hud-turn">1</span> / <span id="hud-max-turn">5</span> | Dusman: <span id="hud-dusman">0</span></div>
                 </div>
 

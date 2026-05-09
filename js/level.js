@@ -4,28 +4,29 @@ import { vegaBolumu } from './vega.js';
 import { kronBolumu } from './kron.js';
 import { NormalEnemy, HighEnemy, QueenEnemy } from './enemy.js';
 import { muzikBaslangic, muzikSakin, muzikAksiyon, muzikDurdurTum } from './audio.js';
+import { mermileriTemizle } from './projectile.js';
 export let aktifBolum = null;
 
 const taretBilgileri = [
     {
-        ad: 'Kalkan Duvari',
-        aciklama: 'Gezegen hattina ulasan dusmanlari tutan ana savunma bariyeri.'
+        ad: 'Blaster Modulu',
+        aciklama: 'Cekirdegin etrafina baglanir ve yakindaki dusmanlara otomatik ates eder.'
     },
     {
-        ad: 'Plazma Silahi',
-        aciklama: 'Hizli atis yapan temel silah. Ilk dalgalarda ana hasari verir.'
+        ad: 'Seri Namlu',
+        aciklama: 'Daha dusuk hasarli ama daha sik ates eden destek moduludur.'
     },
     {
-        ad: 'Iyon Tareti',
-        aciklama: 'Vega ile acilir. Dondurma ve alan kontrolu icin kullanilir.'
+        ad: 'Zincir Modulu',
+        aciklama: 'Vurdugu hedefin yakinindaki baska dusmanlara da hasar aktarir.'
     },
     {
-        ad: 'Agir Lazer',
-        aciklama: 'Nora ile acilir. Yuksek canli hedeflere karsi daha etkilidir.'
+        ad: 'Zirh Modulu',
+        aciklama: 'Yavas ates eder ama cekirdegi koruyan ekstra govde gibi davranir.'
     },
     {
-        ad: 'Kron Modulu',
-        aciklama: 'Kron eglence modunda tum sistemleri sinirsiz mermiyle calistirir.'
+        ad: 'Nabiz Modulu',
+        aciklama: 'Patlama etkili atislarla kalabalik dalgalari temizlemeye yardim eder.'
     }
 ];
 
@@ -57,6 +58,21 @@ function taretleriGuncelle(acikSayisi) {
     });
 }
 
+function modulSlotTiklamalariniBagla() {
+    const slotlar = document.querySelectorAll('.taret-slot');
+    const canvas = document.getElementById('yildiz-alani');
+    slotlar.forEach((slot, index) => {
+        slot.addEventListener('mousedown', (olay) => {
+            olay.preventDefault();
+            olay.stopPropagation();
+            if (olay.button !== 0) return;
+            if (aktifBolum && canvas && typeof aktifBolum.modulSuruklemeBaslat === 'function') {
+                aktifBolum.modulSuruklemeBaslat(index, canvas, olay.clientX, olay.clientY);
+            }
+        });
+    });
+}
+
 export function bolumleriBaslat() {
     const anaMenu = document.getElementById('ana-menu');
     const oyunAlani = document.getElementById('oyun-alani');
@@ -80,29 +96,31 @@ export function bolumleriBaslat() {
     const bilgiIptal = document.getElementById('bolum-bilgi-iptal');
     let secilenAyar = null;
 
+    modulSlotTiklamalariniBagla();
+
     const bolumAyarlari = {
         astra: {
             bolum: astraBolumu,
             asama: 'Asama 1',
             taretSayisi: 2,
             maxTurnLabel: '5',
-            metin: 'Astra ilk savunma gezegenidir. Temel mekaniklerle baslar: duvar hattini koru, dusman karelerini gemi ve plazma atislariyla durdur.',
+            metin: 'Astra moduler savasin girisidir. Cekirdege baglanan modullerle dusman dalgalarini temizle ve hayatta kal.',
             arkaPlan: 'rgba(22, 5, 30, 0.9)'
         },
         vega: {
             bolum: vegaBolumu,
             asama: 'Asama 2',
             taretSayisi: 3,
-            maxTurnLabel: '5',
-            metin: 'Vega ikinci asamadir. Astra sistemlerine ek olarak 3. taret yeri acilir ve alan kontrolu daha onemli hale gelir.',
+            maxTurnLabel: '6',
+            metin: 'Vega seri ve zincir modullerinin acildigi daha hizli bir arenadir. Dusmanlar her yonden cekirdege gelir.',
             arkaPlan: 'rgba(5, 20, 35, 0.95)'
         },
         nora: {
             bolum: noraBolumu,
             asama: 'Asama 3',
             taretSayisi: 4,
-            maxTurnLabel: '5',
-            metin: 'Nora ileri savunma bolumudur. Bir taret yeri daha acilir, dalgalar daha agir gelir ve dayanma suresi kritik olur.',
+            maxTurnLabel: '7',
+            metin: 'Nora daha agir dusmanlar ve zirh moduluyle oynanir. Modulleri kaybetmeden dalga dalga gelen hedefleri yok et.',
             arkaPlan: 'rgba(5, 5, 5, 0.95)'
         },
         kron: {
@@ -110,7 +128,7 @@ export function bolumleriBaslat() {
             asama: 'Eglence Modu',
             taretSayisi: 5,
             maxTurnLabel: '∞',
-            metin: 'Kron gezegeninde tum taretler acik. Sinirsiz mermi ile olene kadar dayan; en iyi suren gezegenin altinda saklanir.',
+            metin: 'Kron sonsuz moddur. Tum moduller acik, dalgalar bitmez; cekirdek parcalanana kadar en yuksek skoru kovala.',
             arkaPlan: 'rgba(10, 20, 10, 0.95)'
         }
     };
@@ -142,6 +160,7 @@ export function bolumleriBaslat() {
 
     function bolumuBaslat(ayar) {
         aktifBolum = ayar.bolum;
+        mermileriTemizle();
         taretleriGuncelle(ayar.taretSayisi);
         if (hudMaxTurn) hudMaxTurn.textContent = ayar.maxTurnLabel;
         aktifBolum.baslat(canvas);
@@ -182,6 +201,7 @@ export function bolumleriBaslat() {
 
     hudMenuBtn?.addEventListener('click', () => {
         if (aktifBolum) aktifBolum.durdur();
+        mermileriTemizle();
         aktifBolum = null;
         secilenAyar = null;
         kronSkorunuGuncelle();

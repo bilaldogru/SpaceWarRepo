@@ -618,12 +618,52 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 18px;
     padding: 0 18px;
     color: #a0aabf;
     font-family: 'Rajdhani', sans-serif;
     font-size: 20px;
     font-weight: bold;
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.hud-dusman-sayaci {
+    flex: 0 1 420px;
+    display: grid;
+    grid-template-columns: auto minmax(120px, 1fr) 54px;
+    align-items: center;
+    gap: 10px;
+    min-width: 260px;
+}
+
+.hud-dusman-sayaci span,
+.hud-dusman-sayaci strong {
+    color: #ffffff;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+.hud-dusman-sayaci strong {
+    color: #5ae0ff;
+    text-align: right;
+}
+
+.hud-dusman-iz {
+    height: 12px;
+    border: 1px solid rgba(90, 224, 255, 0.58);
+    border-radius: 999px;
+    background: rgba(3, 8, 18, 0.72);
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.55);
+}
+
+.hud-dusman-bar {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #55efc4, #5ae0ff, #ff6b6b);
+    box-shadow: 0 0 14px rgba(90, 224, 255, 0.5);
+    transition: width 0.18s ease;
 }
 
 .taret-slot {
@@ -635,6 +675,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+    gap: 2px;
     color: #5ae0ff;
     font-family: 'Orbitron', sans-serif;
     font-size: 18px;
@@ -642,16 +684,44 @@ body {
     position: relative;
     border-radius: 5px;
     transition: 0.3s;
+    user-select: none;
 }
 
 .taret-slot::before {
-    content: "";
+    content: none;
     width: 34px;
     height: 34px;
     flex: 0 0 34px;
     border-radius: 50%;
     border: 1px solid rgba(90, 224, 255, 0.35);
     background: rgba(255, 255, 255, 0.04);
+}
+
+.modul-ad {
+    color: #ffffff;
+    font-size: 12px;
+    line-height: 1;
+}
+
+.modul-fiyat,
+.modul-sure {
+    color: #aeb9cd;
+    font-size: 11px;
+    line-height: 1;
+}
+
+.taret-slot.alinabilir {
+    border-style: solid;
+    background: rgba(85, 239, 196, 0.12);
+}
+
+.taret-slot.aktif-modul {
+    border-color: #55efc4;
+    box-shadow: inset 0 0 18px rgba(85, 239, 196, 0.22), 0 0 14px rgba(85, 239, 196, 0.15);
+}
+
+.taret-slot.aktif-modul .modul-sure {
+    color: #55efc4;
 }
 
 .taret-numara {
@@ -706,6 +776,18 @@ body {
 
     .taret-slot {
         height: 56px;
+    }
+
+    .hud-alt-bar {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .hud-dusman-sayaci {
+        flex: 1 1 auto;
+        width: 100%;
+        min-width: 0;
     }
 }
 

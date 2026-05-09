@@ -7,16 +7,17 @@ Bu proje, [Üniversite/Ders Adı] Web Tabanlı Programlama dersi kapsamında HTM
 * **Oyun Tanıtım Videosu / Sunum Dosyası:** [Varsa Link veya PDF adı]
 
 ## 🎯 Hedeflenen Oyun ve Temel Mekanik
-* **Seçilen Referans Oyun:** [İlham Alınan İtch.io Oyununun Adı]
-* **Referans Oyun Linki:** [https://ornekoyun.itch.io/oyun-linki]
-* **Uyarlanan Temel Mekanik:** Oyuncu, merkezdeki uzay gemisini kontrol ederek 4 farklı gezegende (bölümde) üzerine akın akın gelen düşman dalgalarına (wave) karşı hayatta kalmaya çalışır. Düşmanlar oyuncuya doğru farklı hareket kalıplarıyla (düz, zig-zag) yaklaşır. Hedef, geminin canı sıfırlanmadan mümkün olan en yüksek skoru elde etmektir.
+* **Secilen Referans Oyun:** Modular Defense
+* **Referans Oyun Linki:** https://michal23.itch.io/modular-defense
+* **Uyarlanan Temel Mekanik:** Modular Defense oyunundaki komut modulune baglanan savas modulleriyle guclenme ve bitmeyen dusman dalgalarina karsi hayatta kalma fikri referans alinmistir. Bu projede oyuncu 4 farkli gezegen arenasinda cekirdek gemiyi kontrol eder, dusmanlari yok ettikce skor kazanir ve bu skorla sureli savas modulleri satin alir. Harita ekrandan buyuktur; kamera oyuncuyu takip eder ve haritanin sinirlari vardir.
 
 ## 🎮 Kontroller ve Oynanış (Challenge)
-Oyundaki temel zorluk (challenge), düşman sayısının her dalgada artması ve mermi kısıtlaması/atış hızı dengesini koruyarak gemiyi doğru konumlandırmaktır.
+Oyundaki temel zorluk (challenge), dusman sayisinin her dalgada artmasi, cekirdek modulu korumak ve toplanan savas modullerini kaybetmeden pozisyon alabilmektir.
 
 * **W, A, S, D:** Uzay gemisini yukarı, sola, aşağı ve sağa hareket ettirir.
 * **Fare (Mouse) Hareketi:** Geminin namlusunu (açısını) farenin olduğu yöne döndürür.
 * **Fare Sol Tık (Left Click):** İmlecin bulunduğu yöne doğru ateş eder.
+* **Modul Satin Alma:** Dusmanlardan kazanilan skorla ust bardaki 5 modul karesinden satin alma yapilir. Satin alinan moduller gemiye yapismaz; oyuncunun yakininda sabit taret olarak haritaya yerlesir. Ayni anda en fazla 2 sureli modul aktif olabilir; ayni modul tekrar satin alinirsa kopya olusmaz, suresi uzar.
 
 ## 👥 Geliştirici Ekip ve Görev Dağılımı
 * **[Öğrenci Adı Soyadı 1] ([Öğrenci No]):** Oyuncu hareketi, fizik motoru ve çarpışma (collision) testleri (`player.js`, `projectile.js`).

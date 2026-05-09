@@ -29,8 +29,27 @@ for (let i = 0; i < yildizSayisi; i++) {
 }
 
 window.addEventListener('mousedown', (olay) => {
+    if (aktifBolum?.suruklenenModul) return;
     if (olay.button === 0 && (!aktifBolum || aktifBolum.atesEtmeyeIzinVar())) {
         mermiAtesle(gemi);
+    }
+});
+
+window.addEventListener('mousemove', (olay) => {
+    if (aktifBolum && typeof aktifBolum.modulSuruklemeGuncelle === 'function') {
+        aktifBolum.modulSuruklemeGuncelle(canvas, olay.clientX, olay.clientY);
+    }
+});
+
+window.addEventListener('mouseup', (olay) => {
+    if (olay.button === 0 && aktifBolum && typeof aktifBolum.modulSuruklemeBitir === 'function') {
+        aktifBolum.modulSuruklemeBitir(canvas, olay.clientX, olay.clientY);
+    }
+});
+
+window.addEventListener('blur', () => {
+    if (aktifBolum && typeof aktifBolum.modulSuruklemeIptal === 'function') {
+        aktifBolum.modulSuruklemeIptal();
     }
 });
 
@@ -68,15 +87,15 @@ function yildizlariCiz() {
 function oyunDongusu() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     yildizlariCiz();
+    gemiyiGuncelle(canvas, aktifBolum);
 
     if (aktifBolum) {
         aktifBolum.guncelle(canvas, mermiler, gemi);
         aktifBolum.ciz(ctx, canvas);
     }
 
-    gemiyiGuncelle(canvas);
-    mermileriGuncelleVeCiz(ctx, canvas);
-    gemiyiCiz(ctx);
+    mermileriGuncelleVeCiz(ctx, canvas, aktifBolum);
+    gemiyiCiz(ctx, aktifBolum?.kamera);
 
     if (aktifBolum && aktifBolum.oyunBitti) {
         aktifBolum.oyunSonuEkraniCiz(ctx, canvas);

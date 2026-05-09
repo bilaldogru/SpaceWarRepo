@@ -75,7 +75,7 @@ export class EnemyType2 extends Enemy {
         const dx = hedefX - this.x;
         const dy = hedefY - this.y;
         const uzaklik = Math.sqrt(dx * dx + dy * dy) || 1;
-        const hiz = 4.8;
+        const hiz = 3.1;
 
         bolum.lazerler.push({
             x: this.x - this.boyut / 2,
