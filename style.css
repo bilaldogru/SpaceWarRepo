@@ -542,252 +542,386 @@ body {
     margin-top: 18px;
 }
 
-/* --- OYUN ICI HUD TASARIMLARI --- */
+/* ======================================================
+   SCI-FI HUD — YENİDEN TASARIM
+   ====================================================== */
+
+/* --- Kök CSS değişkenleri --- */
+:root {
+    --clr-bg:      #071018;
+    --clr-cyan:    #41e0ff;
+    --clr-purple:  #8b5cf6;
+    --clr-danger:  #ff4d6d;
+    --clr-credits: #f9ca24;
+    --clr-panel:   rgba(7, 16, 24, 0.78);
+    --clr-border:  rgba(65, 224, 255, 0.22);
+    --blur:        blur(12px);
+    --hud-safe-top: 52px;
+}
+
+/* Ana HUD kapsayıcı — tüm ekranı kaplar, pointer-events sadece gerekli alanlarda açık */
 .oyun-hud {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    position: fixed;
+    inset: 0;
     z-index: 100;
-    padding: 12px;
-    box-sizing: border-box;
+    pointer-events: none;
+    display: flex;
     flex-direction: column;
-    gap: 8px;
+}
+
+/* =========================================
+   ÜST ŞERIT — ince, bilgi yoğun
+   ========================================= */
+.hud-top-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 44px;
+    padding: 0 16px;
+    background: rgba(7, 16, 24, 0.82);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border-bottom: 1px solid var(--clr-border);
+    box-shadow: 0 2px 18px rgba(65, 224, 255, 0.08);
+    pointer-events: auto;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.hud-top-left,
+.hud-top-center,
+.hud-top-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hud-top-right { margin-left: auto; gap: 10px; }
+
+.hud-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(65, 224, 255, 0.55);
+    text-transform: uppercase;
+}
+
+.hud-val {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 0 10px var(--clr-cyan);
+}
+
+.hud-sep { color: rgba(255,255,255,0.3); font-size: 14px; }
+
+.hud-timer {
+    color: var(--clr-cyan);
+    text-shadow: 0 0 14px var(--clr-cyan);
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-glow {
+    from { text-shadow: 0 0 8px var(--clr-cyan); }
+    to   { text-shadow: 0 0 20px var(--clr-cyan), 0 0 40px rgba(65,224,255,0.3); }
+}
+
+.hud-pause-btn {
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.45);
+    color: #c4b5fd;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    pointer-events: auto;
+}
+.hud-pause-btn:hover {
+    background: rgba(139, 92, 246, 0.35);
+    border-color: var(--clr-purple);
+    box-shadow: 0 0 14px rgba(139, 92, 246, 0.4);
+    color: #ffffff;
+    transform: scale(1.04);
+}
+
+/* =========================================
+   SOL SIDEBAR — taret slotları
+   ========================================= */
+.hud-sidebar {
+    position: absolute;
+    top: 52px;
+    left: 12px;
+    width: 130px;
+    background: var(--clr-panel);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--clr-border);
+    border-radius: 10px;
+    padding: 10px 8px;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(65,224,255,0.06);
+}
+
+.sidebar-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--clr-border);
+}
+
+.sidebar-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--clr-cyan);
+    text-shadow: 0 0 8px var(--clr-cyan);
+}
+
+.sidebar-hint {
+    font-size: 9px;
+    color: rgba(255,255,255,0.28);
+    letter-spacing: 0.5px;
+}
+
+/* Taret paneli — tek sütun sidebar'da */
+.hud-taret-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.taret-slot {
+    position: relative;
+    height: 62px;
+    box-sizing: border-box;
+    border: 1px solid rgba(65, 224, 255, 0.28);
+    background: rgba(65, 224, 255, 0.04);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    color: var(--clr-cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    cursor: pointer;
+    border-radius: 7px;
+    transition: all 0.25s ease;
+    user-select: none;
+    overflow: hidden;
+}
+
+.taret-slot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(65,224,255,0.06) 0%, transparent 60%);
+    border-radius: inherit;
     pointer-events: none;
 }
 
-.hud-ust-bar {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    background: linear-gradient(180deg, rgba(8, 14, 28, 0.92), rgba(12, 20, 38, 0.74));
-    border: 1px solid rgba(90, 224, 255, 0.75);
-    box-shadow: 0 0 24px rgba(90, 224, 255, 0.18), inset 0 0 18px rgba(90, 224, 255, 0.08);
-    padding: 10px;
-    border-radius: 8px;
-    pointer-events: auto;
+.taret-slot:hover:not(.kilitli) {
+    background: rgba(65, 224, 255, 0.14);
+    border-color: var(--clr-cyan);
+    box-shadow: 0 0 16px rgba(65, 224, 255, 0.25), inset 0 0 10px rgba(65,224,255,0.08);
+    transform: translateX(2px);
 }
 
-.hud-taret-panel {
-    flex: 1 1 auto;
-    display: grid;
-    grid-template-columns: repeat(5, minmax(82px, 1fr));
-    gap: 10px;
-    min-width: 0;
+.taret-slot.alinabilir {
+    border-color: rgba(85, 239, 196, 0.55);
+    background: rgba(85, 239, 196, 0.08);
 }
 
-.hud-stat-panel {
-    flex: 0 0 310px;
-    display: grid;
-    grid-template-columns: repeat(2, 150px);
-    grid-auto-rows: 34px;
-    gap: 6px 8px;
-    color: white;
+.taret-slot.aktif-modul {
+    border-color: #55efc4;
+    background: rgba(85, 239, 196, 0.1);
+    box-shadow: 0 0 12px rgba(85, 239, 196, 0.3), inset 0 0 8px rgba(85,239,196,0.12);
+    animation: slot-pulse 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes slot-pulse {
+    from { box-shadow: 0 0 8px rgba(85,239,196,0.25); }
+    to   { box-shadow: 0 0 20px rgba(85,239,196,0.55), inset 0 0 12px rgba(85,239,196,0.18); }
+}
+
+.taret-slot.aktif-modul .modul-sure { color: #55efc4; }
+
+.taret-slot.kilitli {
+    border-color: rgba(255, 77, 109, 0.22);
+    background: rgba(255, 77, 109, 0.04);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.taret-numara {
+    position: absolute;
+    top: 4px;
+    right: 5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(4, 9, 18, 0.9);
+    border: 1px solid rgba(65, 224, 255, 0.5);
+    color: rgba(255,255,255,0.7);
+    font-size: 9px;
+    line-height: 16px;
+    text-align: center;
     font-family: 'Orbitron', sans-serif;
-    font-size: 12px;
-    white-space: nowrap;
 }
 
-.hud-stat-kutu {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-width: 0;
-    height: 34px;
-    box-sizing: border-box;
-    padding: 0 9px;
-    border: 1px solid rgba(90, 224, 255, 0.45);
-    border-radius: 5px;
-    background: rgba(3, 8, 18, 0.58);
+.taret-slot.kilitli .taret-numara {
+    border-color: rgba(255,77,109,0.4);
+    color: rgba(255,77,109,0.7);
 }
 
-.hud-stat-kutu span {
-    color: #5ae0ff;
-    min-width: 40px;
-    text-align: right;
-}
-
-.hud-menu-btn {
-    flex: 0 0 auto;
-    margin: 0;
-    min-width: 78px;
-}
-
-.hud-alt-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 18px;
-    padding: 0 18px;
-    color: #a0aabf;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 20px;
-    font-weight: bold;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
-}
-
-.hud-dusman-sayaci {
-    flex: 0 1 420px;
-    display: grid;
-    grid-template-columns: auto minmax(120px, 1fr) 54px;
-    align-items: center;
-    gap: 10px;
-    min-width: 260px;
-}
-
-.hud-dusman-sayaci span,
-.hud-dusman-sayaci strong {
+.modul-ad {
     color: #ffffff;
+    font-size: 9px;
+    line-height: 1;
+    text-align: center;
+    padding: 0 4px;
+}
+
+.modul-gorev {
+    color: #55efc4;
+    font-size: 8px;
+    line-height: 1;
+    text-align: center;
+}
+
+.modul-fiyat,
+.modul-sure {
+    color: rgba(174, 185, 205, 0.75);
+    font-size: 8px;
+    line-height: 1;
+}
+
+/* =========================================
+   ALT STAT BAR
+   ========================================= */
+.hud-bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0 14px;
+    background: rgba(7, 16, 24, 0.82);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border-top: 1px solid var(--clr-border);
+    box-shadow: 0 -4px 24px rgba(65, 224, 255, 0.06);
+    pointer-events: none;
+}
+
+.hud-stat-block {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 10px;
+    border-right: 1px solid rgba(65, 224, 255, 0.1);
+}
+
+.hud-stat-block:last-child { border-right: none; }
+.hud-stat-block--wide { flex: 1.4; }
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    color: rgba(65, 224, 255, 0.45);
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-family: 'Orbitron', sans-serif;
     font-size: 16px;
-    white-space: nowrap;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(255,255,255,0.3);
 }
 
-.hud-dusman-sayaci strong {
-    color: #5ae0ff;
-    text-align: right;
+.stat-value.danger {
+    color: var(--clr-danger);
+    text-shadow: 0 0 10px var(--clr-danger);
 }
 
-.hud-dusman-iz {
-    height: 12px;
-    border: 1px solid rgba(90, 224, 255, 0.58);
+.stat-value.credits {
+    color: var(--clr-credits);
+    text-shadow: 0 0 10px var(--clr-credits);
+}
+
+.stat-bar-wrap {
+    height: 5px;
+    background: rgba(255,255,255,0.06);
     border-radius: 999px;
-    background: rgba(3, 8, 18, 0.72);
     overflow: hidden;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.stat-bar {
+    height: 100%;
+    border-radius: inherit;
+    transition: width 0.3s ease;
+    width: 100%;
+}
+
+.stat-bar-hp {
+    background: linear-gradient(90deg, var(--clr-danger), #ff8fab);
+    box-shadow: 0 0 8px rgba(255,77,109,0.6);
+}
+
+.stat-bar-ammo {
+    background: linear-gradient(90deg, var(--clr-cyan), #a0f0ff);
+    box-shadow: 0 0 8px rgba(65,224,255,0.5);
+}
+
+/* Dusman progress bar (reuse) */
+.hud-dusman-iz {
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+    margin-top: 2px;
 }
 
 .hud-dusman-bar {
     width: 0;
     height: 100%;
     border-radius: inherit;
-    background: linear-gradient(90deg, #55efc4, #5ae0ff, #ff6b6b);
-    box-shadow: 0 0 14px rgba(90, 224, 255, 0.5);
-    transition: width 0.18s ease;
+    background: linear-gradient(90deg, #55efc4, var(--clr-cyan), var(--clr-danger));
+    box-shadow: 0 0 8px rgba(65,224,255,0.4);
+    transition: width 0.2s ease;
 }
 
-.taret-slot {
-    min-width: 0;
-    height: 72px;
-    box-sizing: border-box;
-    border: 2px dashed #5ae0ff;
-    background: rgba(90, 224, 255, 0.08);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 2px;
-    color: #5ae0ff;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 18px;
-    cursor: pointer;
-    position: relative;
-    border-radius: 5px;
-    transition: 0.3s;
-    user-select: none;
-}
-
-.taret-slot::before {
-    content: none;
-    width: 34px;
-    height: 34px;
-    flex: 0 0 34px;
-    border-radius: 50%;
-    border: 1px solid rgba(90, 224, 255, 0.35);
-    background: rgba(255, 255, 255, 0.04);
-}
-
-.modul-ad {
-    color: #ffffff;
-    font-size: 12px;
-    line-height: 1;
-}
-
-.modul-fiyat,
-.modul-sure {
-    color: #aeb9cd;
-    font-size: 11px;
-    line-height: 1;
-}
-
-.taret-slot.alinabilir {
-    border-style: solid;
-    background: rgba(85, 239, 196, 0.12);
-}
-
-.taret-slot.aktif-modul {
-    border-color: #55efc4;
-    box-shadow: inset 0 0 18px rgba(85, 239, 196, 0.22), 0 0 14px rgba(85, 239, 196, 0.15);
-}
-
-.taret-slot.aktif-modul .modul-sure {
-    color: #55efc4;
-}
-
-.taret-numara {
-    position: absolute;
-    top: 5px;
-    right: 6px;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: rgba(4, 9, 18, 0.9);
-    border: 1px solid rgba(90, 224, 255, 0.7);
-    color: #ffffff;
-    font-size: 11px;
-    line-height: 18px;
-    text-align: center;
-}
-
-.taret-slot:hover:not(.kilitli) {
-    background: rgba(90, 224, 255, 0.3);
-    border-style: solid;
-}
-
-.taret-slot.kilitli {
-    border-color: #ff4747;
-    color: #ff4747;
-    background: rgba(255, 71, 71, 0.1);
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
-.taret-slot.kilitli .taret-numara {
-    border-color: rgba(255, 71, 71, 0.7);
-    color: #ffb3b3;
-}
-
+/* Responsive — 900px */
 @media (max-width: 900px) {
-    .hud-ust-bar {
-        align-items: stretch;
-        flex-wrap: wrap;
-    }
-
-    .hud-taret-panel {
-        flex-basis: 100%;
-        grid-template-columns: repeat(5, minmax(54px, 1fr));
-    }
-
-    .hud-stat-panel {
-        flex: 1 1 auto;
-        grid-template-columns: repeat(2, minmax(124px, 1fr));
-        font-size: 11px;
-    }
-
-    .taret-slot {
-        height: 56px;
-    }
-
-    .hud-alt-bar {
-        align-items: stretch;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    .hud-dusman-sayaci {
-        flex: 1 1 auto;
-        width: 100%;
-        min-width: 0;
-    }
+    :root { --hud-safe-top: 52px; }
+    .hud-sidebar { width: 110px; }
+    .taret-slot { height: 52px; }
+    .hud-bottom-bar { height: 58px; }
+    .stat-value { font-size: 13px; }
 }
 
 /* =======================================================

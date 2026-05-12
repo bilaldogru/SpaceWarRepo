@@ -63,6 +63,19 @@ const MODULES = [
         fiyat: 210,
         sure: 12,
         maxCan: 120
+    },
+    {
+        id: 'chain',
+        ad: 'Yildirim Zinciri',
+        gorev: 'Zincir Hasar',
+        aciklama: 'Bir dusmana isabet eden mermi, en yakin diger dusmana da simsek carpar.',
+        renk: '#f9ca24',
+        radius: 310,
+        chainDamage: 22,
+        chainRange: 270,
+        fiyat: 185,
+        sure: 13,
+        maxCan: 105
     }
 ];
 
@@ -150,6 +163,7 @@ export function createModularLevel(config) {
         lazerler: [],
         moduleShots: [],
         pickups: [],
+        chainEffects: [],
         skorYazilari: [],
         modules: [],
         spawnQueue: [],
@@ -204,6 +218,7 @@ export function createModularLevel(config) {
             this.lazerler = [];
             this.moduleShots = [];
             this.pickups = [];
+            this.chainEffects = [];
             this.skorYazilari = [];
             this.modules = [];
             this.spawnQueue = [];
@@ -237,6 +252,7 @@ export function createModularLevel(config) {
             this.lazerler = [];
             this.moduleShots = [];
             this.pickups = [];
+            this.chainEffects = [];
             this.skorYazilari = [];
             this.spawnQueue = [];
             this.aktifSatinAlimlar = [];
@@ -580,6 +596,49 @@ export function createModularLevel(config) {
             });
         },
 
+        chainZincirUygula(vuruldusan) {
+            // Sadece Nora gezegeninde aktif
+            if (this.isim !== 'Nora') return;
+
+            const chainModul = this.modules.find(m => m.chainDamage && mesafe(m, gemi) <= m.radius);
+            if (!chainModul) return;
+
+            let hedef = null;
+            let enKisa = chainModul.chainRange || 270;
+            for (const d of this.dusmanlar) {
+                if (d === vuruldusan) continue;
+                const uz = mesafe(d, vuruldusan);
+                if (uz < enKisa) { enKisa = uz; hedef = d; }
+            }
+            if (!hedef) return;
+
+            // Zigzag noktalarini onceden hesapla (titreme olmamasi icin)
+            const segments = 7;
+            const noktalar = [];
+            for (let i = 1; i < segments; i++) {
+                const t = i / segments;
+                noktalar.push({
+                    x: vuruldusan.x + (hedef.x - vuruldusan.x) * t + (Math.random() - 0.5) * 32,
+                    y: vuruldusan.y + (hedef.y - vuruldusan.y) * t + (Math.random() - 0.5) * 32
+                });
+            }
+
+            this.chainEffects.push({
+                x1: vuruldusan.x, y1: vuruldusan.y,
+                x2: hedef.x,      y2: hedef.y,
+                noktalar,
+                baslangic: performance.now(),
+                sure: 380,
+                renk: chainModul.renk
+            });
+
+            hedef.can -= chainModul.chainDamage;
+            if (hedef.can <= 0) {
+                const idx = this.dusmanlar.indexOf(hedef);
+                if (idx !== -1) this.dusmanYokEt(idx, hedef);
+            }
+        },
+
         mermiCarpismalariniKontrolEt(mermiler) {
             for (let i = mermiler.length - 1; i >= 0; i--) {
                 const mermi = mermiler[i];
@@ -593,6 +652,7 @@ export function createModularLevel(config) {
                 const dusman = this.dusmanlar[j];
                 if (mesafe(mermi, dusman) < dusman.boyut / 2 + (mermi.yaricap || 4)) {
                     dusman.can -= mermi.hasar || varsayilanHasar;
+                    this.chainZincirUygula(dusman);
                     if (dusman.can <= 0) this.dusmanYokEt(j, dusman);
                     for (let k = this.dusmanlar.length - 1; k >= 0; k--) {
                         if (this.dusmanlar[k].can <= 0) this.dusmanYokEt(k, this.dusmanlar[k]);
@@ -936,6 +996,7 @@ export function createModularLevel(config) {
                 ctx.restore();
             });
 
+            this.chainEffekleriniCiz(ctx);
             drawEnemyLasers(ctx, this.lazerler);
             drawSquareEnemies(ctx, this.dusmanlar, this.canBariCiz.bind(this));
 
@@ -949,6 +1010,45 @@ export function createModularLevel(config) {
             ctx.restore();
 
             ctx.restore();
+        },
+
+        chainEffekleriniCiz(ctx) {
+            const simdi = performance.now();
+            this.chainEffects = this.chainEffects.filter(ef => simdi - ef.baslangic < ef.sure);
+            this.chainEffects.forEach(ef => {
+                const oran = (simdi - ef.baslangic) / ef.sure;
+                ctx.save();
+                ctx.globalAlpha = (1 - oran) * 0.92;
+                ctx.strokeStyle = ef.renk;
+                ctx.lineWidth = 2.8 - oran * 1.8;
+                ctx.shadowBlur = 22;
+                ctx.shadowColor = ef.renk;
+                ctx.beginPath();
+                ctx.moveTo(ef.x1, ef.y1);
+                ef.noktalar.forEach(p => ctx.lineTo(p.x, p.y));
+                ctx.lineTo(ef.x2, ef.y2);
+                ctx.stroke();
+                // Ikinci gecis: daha ince, beyazimsi ic
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 0.9;
+                ctx.globalAlpha = (1 - oran) * 0.55;
+                ctx.shadowBlur = 8;
+                ctx.beginPath();
+                ctx.moveTo(ef.x1, ef.y1);
+                ef.noktalar.forEach(p => ctx.lineTo(p.x, p.y));
+                ctx.lineTo(ef.x2, ef.y2);
+                ctx.stroke();
+                // Etki noktasi cemberi
+                ctx.beginPath();
+                ctx.arc(ef.x2, ef.y2, 7 * (1 - oran), 0, Math.PI * 2);
+                ctx.strokeStyle = ef.renk;
+                ctx.lineWidth = 2;
+                ctx.globalAlpha = (1 - oran) * 0.8;
+                ctx.shadowColor = ef.renk;
+                ctx.shadowBlur = 14;
+                ctx.stroke();
+                ctx.restore();
+            });
         },
 
         haritaIzgarasiCiz(ctx) {

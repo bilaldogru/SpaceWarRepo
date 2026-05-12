@@ -90,36 +90,86 @@
             </div>
 
             <div id="oyun-hud" class="oyun-hud" style="display: none;">
-                <div class="hud-ust-bar">
+
+                <!-- UST BILGI BARI -->
+                <div class="hud-top-strip">
+                    <div class="hud-top-left">
+                        <span class="hud-label">DALGA</span>
+                        <span class="hud-val" id="hud-turn">1</span>
+                        <span class="hud-sep">/</span>
+                        <span class="hud-val" id="hud-max-turn">5</span>
+                    </div>
+                    <div class="hud-top-center">
+                        <span class="hud-label">SURE</span>
+                        <span class="hud-val hud-timer" id="hud-sure">00:00</span>
+                    </div>
+                    <div class="hud-top-right">
+                        <span class="hud-label">DUSMANLAR</span>
+                        <span class="hud-val" id="hud-dusman-kalan">0/0</span>
+                        <button id="hud-ana-menu-btn" class="hud-pause-btn">&#9646;&#9646; MENU</button>
+                    </div>
+                </div>
+
+                <!-- SOL SLOT / SHOP SIDEBAR -->
+                <div class="hud-sidebar">
+                    <div class="sidebar-header">
+                        <span class="sidebar-title">TARETLER</span>
+                        <span class="sidebar-hint">surukle &amp; birak</span>
+                    </div>
                     <div class="hud-taret-panel">
                         <div class="taret-slot"><span class="taret-numara">1</span></div>
                         <div class="taret-slot"><span class="taret-numara">2</span></div>
                         <div class="taret-slot"><span class="taret-numara">3</span></div>
                         <div class="taret-slot kilitli"><span class="taret-numara">4</span></div>
                         <div class="taret-slot kilitli"><span class="taret-numara">5</span></div>
+                        <div class="taret-slot kilitli"><span class="taret-numara">6</span></div>
                     </div>
-
-                    <div class="hud-stat-panel">
-                        <div class="hud-stat-kutu">Can: <span id="hud-can">100</span></div>
-                        <div class="hud-stat-kutu">Para: <span id="hud-para">0</span></div>
-                        <div class="hud-stat-kutu">Skor: <span id="hud-skor">0</span></div>
-                        <div class="hud-stat-kutu">Mermi: <span id="hud-mermi">20/20</span></div>
-                    </div>
-
-                    <button id="hud-ana-menu-btn" class="oyun-butonu kucuk-buton hud-menu-btn">Menu</button>
                 </div>
 
-                <div class="hud-alt-bar">
-                    <div>Gecen Sure: <span id="hud-sure">00:00</span></div>
-                    <div class="hud-dusman-sayaci" aria-label="Kalan dusman sayaci">
-                        <span>Kalan Dusman</span>
+                <!-- ALT STAT BARI -->
+                <div class="hud-bottom-bar">
+                    <div class="hud-stat-block">
+                        <div class="stat-row">
+                            <span class="stat-label">CAN</span>
+                            <span class="stat-value danger" id="hud-can">100</span>
+                        </div>
+                        <div class="stat-bar-wrap">
+                            <div class="stat-bar stat-bar-hp" id="hud-can-bar"></div>
+                        </div>
+                    </div>
+                    <div class="hud-stat-block">
+                        <div class="stat-row">
+                            <span class="stat-label">MERMİ</span>
+                            <span class="stat-value" id="hud-mermi">20/20</span>
+                        </div>
+                        <div class="stat-bar-wrap">
+                            <div class="stat-bar stat-bar-ammo" id="hud-mermi-bar"></div>
+                        </div>
+                    </div>
+                    <div class="hud-stat-block hud-stat-block--wide">
+                        <div class="stat-row">
+                            <span class="stat-label">PARA</span>
+                            <span class="stat-value credits" id="hud-para">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">SKOR</span>
+                            <span class="stat-value" id="hud-skor">0</span>
+                        </div>
+                    </div>
+                    <div class="hud-stat-block">
+                        <div class="stat-row">
+                            <span class="stat-label">DUSMANLAR</span>
+                        </div>
                         <div class="hud-dusman-iz">
                             <div id="hud-dusman-bar" class="hud-dusman-bar"></div>
                         </div>
-                        <strong id="hud-dusman-kalan">0/0</strong>
+                        <span class="stat-value" id="hud-dusman">0</span>
                     </div>
-                    <div>Turn: <span id="hud-turn">1</span> / <span id="hud-max-turn">5</span> | Dusman: <span id="hud-dusman">0</span></div>
                 </div>
+
+                <!-- gizli uyumluluk alanlari -->
+                <span id="hud-oyuncu-can" style="display:none"></span>
+                <span id="hud-kombo" style="display:none"></span>
             </div>
         </div>
 
