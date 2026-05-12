@@ -11,7 +11,7 @@ export const kronBolumu = createModularLevel({
     endless: true,
     acikModulSayisi: 5,
     maxModuleSayisi: 8,
-    baslangicModulleri: ['rapid', 'chain', 'armor'],
+    baslangicModulleri: ['rapid', 'heal', 'speed'],
     dalgaBaslangic: 8,
     dalgaArtis: 3,
     spawnGecikmesi: 320,

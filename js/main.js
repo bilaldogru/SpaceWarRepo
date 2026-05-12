@@ -2,6 +2,7 @@ import { arayuzuBaslat } from './ui.js';
 import { gemi, gemiGorseli, gemiyiGuncelle, gemiyiCiz } from './player.js';
 import { mermiAtesle, mermiler, mermileriGuncelleVeCiz } from './projectile.js';
 import { aktifBolum, bolumleriBaslat } from './level.js';
+import { fare } from './input.js';
 
 const canvas = document.getElementById('yildiz-alani');
 const ctx = canvas.getContext('2d');
@@ -30,8 +31,10 @@ for (let i = 0; i < yildizSayisi; i++) {
 
 window.addEventListener('mousedown', (olay) => {
     if (aktifBolum?.suruklenenModul) return;
+    fare.x = olay.clientX;
+    fare.y = olay.clientY;
     if (olay.button === 0 && (!aktifBolum || aktifBolum.atesEtmeyeIzinVar())) {
-        mermiAtesle(gemi);
+        mermiAtesle(gemi, aktifBolum);
     }
 });
 
@@ -61,7 +64,7 @@ window.addEventListener('keydown', (olay) => {
     if (olay.key === ' ') {
         olay.preventDefault();
         if (!aktifBolum || aktifBolum.atesEtmeyeIzinVar()) {
-            mermiAtesle(gemi);
+            mermiAtesle(gemi, aktifBolum);
         }
     }
 });

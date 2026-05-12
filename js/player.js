@@ -12,6 +12,14 @@ export const gemi =
     aci: 0
 };
 
+function hudAltSiniri() {
+    const hud = document.getElementById('oyun-hud');
+    if (!hud || hud.style.display === 'none') return 0;
+    const ustBar = hud.querySelector('.hud-ust-bar');
+    const rect = ustBar?.getBoundingClientRect();
+    return rect ? Math.ceil(rect.bottom + 10) : 0;
+}
+
 // Gemi görseli
 export const gemiGorseli = new Image();
 
@@ -22,11 +30,20 @@ export function gemiyiGuncelle(canvas, bolum = null) {
     const haritaGenislik = bolum?.haritaGenislik || canvas.width;
     const haritaYukseklik = bolum?.haritaYukseklik || canvas.height;
     const kamera = bolum?.kamera || { x: 0, y: 0 };
+    const yarimGenislik = gemi.genislik / 2;
+    const yarimUzunluk = gemi.uzunluk / 2;
+    const ustSinir = bolum ? kamera.y + hudAltSiniri() + yarimUzunluk : yarimUzunluk;
+    const altSinir = haritaYukseklik - yarimUzunluk;
+    const solSinir = yarimGenislik;
+    const sagSinir = haritaGenislik - yarimGenislik;
 
-    if (basilanTuslar.w && gemi.y - (gemi.uzunluk / 2) > 0) gemi.y -= gemi.hiz;
-    if (basilanTuslar.s && gemi.y + (gemi.uzunluk / 2) < haritaYukseklik) gemi.y += gemi.hiz;
-    if (basilanTuslar.a && gemi.x - (gemi.genislik / 2) > 0) gemi.x -= gemi.hiz;
-    if (basilanTuslar.d && gemi.x + (gemi.genislik / 2) < haritaGenislik) gemi.x += gemi.hiz;
+    if (basilanTuslar.w) gemi.y -= gemi.hiz;
+    if (basilanTuslar.s) gemi.y += gemi.hiz;
+    if (basilanTuslar.a) gemi.x -= gemi.hiz;
+    if (basilanTuslar.d) gemi.x += gemi.hiz;
+
+    gemi.x = Math.max(solSinir, Math.min(sagSinir, gemi.x));
+    gemi.y = Math.max(ustSinir, Math.min(altSinir, gemi.y));
 
 
     // geminin namlusunun fareye doğru dönmesini sağlanır.

@@ -4,33 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Space War</title>
-
-    <!-- Space War Yazı Tipi Daha Etkileyici Olması İçin Hazır Fontlar -->
     <link
         href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;700&display=swap"
         rel="stylesheet">
-
-    <!-- Space War CSS Kodları -->
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <!-- Ses Kontrolleri: Her ekranda görünür (fixed) -->
     <div id="ses-kontrolleri">
-        <button id="muzik-toggle-btn" class="oyun-butonu ses-sabit-btn" title="Müziği Aç/Kapat">🎵</button>
-        <button id="sfx-toggle-btn" class="oyun-butonu ses-sabit-btn" title="Ses Efektlerini Aç/Kapat">🔊</button>
+        <button id="muzik-toggle-btn" class="oyun-butonu ses-sabit-btn" title="Muzigi Ac/Kapat" aria-label="Music On"></button>
+        <button id="sfx-toggle-btn" class="oyun-butonu ses-sabit-btn" title="Ses Efektlerini Ac/Kapat" aria-label="Sound On"></button>
     </div>
 
-    <!-- Canvas Kullanarak Yıldız Animasyonu Üretimi -->
     <canvas id="yildiz-alani"></canvas>
 
-    <!-- Oyunun Ana Arayüzü -->
     <div class="arayuz-kapsayici">
-
-
-        <!-- Ana Menü Ekranı -->
         <div id="ana-menu" class="ekran-icerigi">
-
             <div class="baslik-kapsayici">
                 <h1 class="baslik-space">SPACE</h1>
                 <h2 class="baslik-war">WAR</h2>
@@ -39,53 +28,49 @@
             <div class="buton-grubu">
                 <br><br>
                 <button id="basla-btn" class="oyun-butonu">BASLA</button>
+                <button id="ogretici-btn" class="oyun-butonu">OGRETICI</button>
                 <button id="hakkinda-btn" class="oyun-butonu">HAKKINDA</button>
                 <button id="cikis-btn" class="oyun-butonu">CIKIS</button>
             </div>
-
         </div>
 
-        <!-- Oyun Ekranı -->
         <div id="oyun-alani" class="ekran-icerigi"
             style="display: none; width: 100vw; height: 100vh; position: relative; overflow: hidden;">
 
-            <!-- Taktiksel Gezegen Haritası  -->
             <div class="gezegen-haritasi" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;">
-
-                <!-- MERKEZDEKİ YAZI -->
                 <div class="secim-baslik"
-                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 5;">
+                    style="position: absolute; top: 7%; left: 50%; transform: translateX(-50%); text-align: center; z-index: 5;">
                     <h2 class="panel-baslik"
                         style="font-size: 55px; margin-bottom: 5px; text-shadow: 0 0 20px #5ae0ff;">Gezegen Sec</h2>
                     <p class="panel-metin"
-                        style="font-size: 20px; color: #a0aabf; margin-bottom: 0; text-shadow: none;">Moduler savas
-                        arenasini secmek icin bir gezegene tikla</p>
+                        style="font-size: 20px; color: #a0aabf; margin-bottom: 0; text-shadow: none;">Astra, Vega ve Nora sirayla acilir. Kron Eglence Modu her zaman aciktir.</p>
                 </div>
 
-                <!-- Gezegen 1: Astra (SOL ÜST KÖŞE) -->
-                <div class="harita-noktasi astra" style="top: 15%; left: 10%;">
+                <div class="harita-yolu" aria-hidden="true"></div>
+
+                <div class="harita-noktasi astra ana-gezegen" data-stage="1" style="top: 24%; left: 12%;">
                     <div class="gezegen-kure"></div>
                     <div class="gezegen-isim">Astra</div>
+                    <div class="gezegen-durum">Acik</div>
                 </div>
 
-                <!-- Gezegen 2: Vega (SAĞ ÜST KÖŞE) -->
-                <!-- Dikkat: Sağa yaslamak için 'left' yerine 'right' kullandık -->
-                <div class="harita-noktasi vega" style="top: 15%; right: 10%;">
+                <div class="harita-noktasi vega ana-gezegen" data-stage="2" style="top: 24%; left: calc(50% - 125px);">
                     <div class="gezegen-kure"></div>
                     <div class="gezegen-isim">Vega</div>
+                    <div class="gezegen-durum">Kilitli</div>
                 </div>
 
-                <!-- Gezegen 3: Kron (SOL ALT KÖŞE) -->
-                <div class="harita-noktasi kron" style="bottom: 20%; left: 10%;">
-                    <div class="gezegen-kure"></div>
-                    <div class="gezegen-isim">Kron</div>
-                    <div id="kron-en-iyi-skor" class="gezegen-skor">En iyi: 00:00</div>
-                </div>
-
-                <!-- Gezegen 4: Nora (SAĞ ALT KÖŞE) -->
-                <div class="harita-noktasi nora" style="bottom: 20%; right: 10%;">
+                <div class="harita-noktasi nora ana-gezegen" data-stage="3" style="top: 24%; right: 12%;">
                     <div class="gezegen-kure"></div>
                     <div class="gezegen-isim">Nora</div>
+                    <div class="gezegen-durum">Kilitli</div>
+                </div>
+
+                <div class="harita-noktasi kron kron-eglence" style="bottom: 10%; left: calc(50% - 125px);">
+                    <div class="gezegen-kure"></div>
+                    <div class="gezegen-isim">Kron Eglence Modu</div>
+                    <div class="gezegen-durum">Her zaman acik</div>
+                    <div id="kron-en-iyi-skor" class="gezegen-skor">En iyi: 00:00</div>
                 </div>
 
                 <div id="bolum-bilgi-paneli" class="bolum-bilgi-paneli" style="display: none;">
@@ -102,16 +87,10 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
-            <!-- OYUN İÇİ ARAYÜZ (HUD) - Başlangıçta Gizli -->
             <div id="oyun-hud" class="oyun-hud" style="display: none;">
-
-                <!-- Ust Bar: Moduller ve Statlar -->
                 <div class="hud-ust-bar">
-
-                    <!-- Modul Slotlari (5 Tane) -->
                     <div class="hud-taret-panel">
                         <div class="taret-slot"><span class="taret-numara">1</span></div>
                         <div class="taret-slot"><span class="taret-numara">2</span></div>
@@ -120,19 +99,16 @@
                         <div class="taret-slot kilitli"><span class="taret-numara">5</span></div>
                     </div>
 
-                    <!-- Oyuncu Statları -->
                     <div class="hud-stat-panel">
-                        <div class="hud-stat-kutu">Cekirdek: <span id="hud-can">100</span></div>
-                        <div class="hud-stat-kutu">Modul: <span id="hud-oyuncu-can">1/4</span></div>
-                        <div class="hud-stat-kutu">Skor: <span id="hud-para">0</span></div>
+                        <div class="hud-stat-kutu">Can: <span id="hud-can">100</span></div>
+                        <div class="hud-stat-kutu">Para: <span id="hud-para">0</span></div>
+                        <div class="hud-stat-kutu">Skor: <span id="hud-skor">0</span></div>
                         <div class="hud-stat-kutu">Mermi: <span id="hud-mermi">20/20</span></div>
                     </div>
 
-                    <!-- Ana Menüye Dönüş -->
                     <button id="hud-ana-menu-btn" class="oyun-butonu kucuk-buton hud-menu-btn">Menu</button>
                 </div>
 
-                <!-- Alt Bilgi Barı: Süre ve Turn -->
                 <div class="hud-alt-bar">
                     <div>Gecen Sure: <span id="hud-sure">00:00</span></div>
                     <div class="hud-dusman-sayaci" aria-label="Kalan dusman sayaci">
@@ -144,25 +120,51 @@
                     </div>
                     <div>Turn: <span id="hud-turn">1</span> / <span id="hud-max-turn">5</span> | Dusman: <span id="hud-dusman">0</span></div>
                 </div>
-
             </div>
-
         </div>
 
-        <!-- Hakkında Ekranı -->
         <div id="hakkinda-alani" class="ekran-icerigi panel-kutusu" style="display: none;">
             <h2 class="panel-baslik">Space War Hikayesi</h2>
             <div id="hikaye-icerik" class="panel-metin">
-                <!-- Hikaye.txt buradan yüklenecek -->
-                Yükleniyor...
+                Yukleniyor...
             </div>
             <br>
             <button id="hakkinda-geri-btn" class="oyun-butonu kucuk-buton">ANA MENU</button>
         </div>
-        <!-- Space War JavaScript Kodları -->
+
+        <div id="ogretici-alani" class="ekran-icerigi panel-kutusu ogretici-panel" style="display: none;">
+            <h2 class="panel-baslik">Ogretici</h2>
+            <div class="ogretici-grid panel-metin">
+                <section>
+                    <h3>Nasil hareket edilir?</h3>
+                    <p>W, A, S, D tuslariyla gemiyi hareket ettir. Ust HUD panelinin altinda kalacak sekilde oyun alani sinirlanir.</p>
+                </section>
+                <section>
+                    <h3>Nasil ates edilir?</h3>
+                    <p>Fareyle hedefe nisangahi getir, sol tik veya bosluk tusu ile ates et. Mermi nisangahin merkezine gider.</p>
+                </section>
+                <section>
+                    <h3>Taretler nasil kullanilir?</h3>
+                    <p>Ustteki taret slotunu surukleyip haritaya birak. Ayni aktif tarete tekrar basarsan suresi uzar.</p>
+                </section>
+                <section>
+                    <h3>Dusmanlardan nasil para kazanilir?</h3>
+                    <p>Her dusman turu sabit para verir. Kombo parayi artirmaz, sadece skor ve basari hissi icindir.</p>
+                </section>
+                <section>
+                    <h3>Can sistemi nasil calisir?</h3>
+                    <p>Dusman carpismalari ve lazerler cani azaltir. Can sifir olursa bolum biter. Destek taretleri can veya hiz bonusu verir.</p>
+                </section>
+                <section>
+                    <h3>Haritalar ve eglence modu nedir?</h3>
+                    <p>Astra, Vega ve Nora sirayla acilir. Kron Eglence Modu bagimsizdir ve istedigin zaman oynanabilir.</p>
+                </section>
+            </div>
+            <button id="ogretici-geri-btn" class="oyun-butonu kucuk-buton">ANA MENU</button>
+        </div>
+
         <script type="module" src="js/main.js"></script>
     </div>
-
 </body>
 
 </html>

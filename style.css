@@ -20,7 +20,7 @@ body {
     -moz-user-select: none;
     -ms-user-select: none;
     /* Fare imlecini değiştirme */
-    cursor: url('assets/images/imlec.png'), auto;
+    cursor: url('assets/images/imlec.png') 32 32, auto;
 }
 
 #yildiz-alani {
@@ -31,7 +31,7 @@ body {
     height: 100%;
     z-index: 1;
     /* Fare imlecini değiştirme */
-    cursor: url('assets/images/imlec.png'), crosshair;
+    cursor: url('assets/images/imlec.png') 32 32, crosshair;
 }
 
 /* Sabit ses kontrol paneli — tüm ekranlarda görünür */
@@ -232,7 +232,7 @@ body {
     height: 250px;
     cursor: pointer;
     transition: all 0.3s ease;
-    animation: süzülme 4s infinite ease-in-out alternate;
+    animation: none;
     z-index: 10;
     display: flex;
     flex-direction: column;
@@ -276,7 +276,6 @@ body {
 
 .gezegen-kure:hover {
     filter: brightness(1.08) !important;
-    transform: scale(1.15);
 }
 
 /* Gezegen Küresi Temel Ayarları */
@@ -788,6 +787,189 @@ body {
         flex: 1 1 auto;
         width: 100%;
         min-width: 0;
+    }
+}
+
+/* =======================================================
+   Space Defense guncellemeleri
+   ======================================================= */
+
+:root {
+    --hud-safe-top: 116px;
+}
+
+.oyun-butonu,
+.gezegen-kure,
+.gezegen-isim,
+.taret-slot {
+    cursor: url('assets/images/imlec.png') 32 32, crosshair;
+}
+
+.ses-sabit-btn[data-state="music-on"]::before,
+.ses-sabit-btn[data-state="music-off"]::before {
+    content: "\266B";
+    font-size: 23px;
+}
+
+.ses-sabit-btn[data-state="sfx-on"]::before,
+.ses-sabit-btn[data-state="sfx-off"]::before {
+    content: "";
+    width: 18px;
+    height: 16px;
+    clip-path: polygon(0 35%, 34% 35%, 72% 0, 72% 100%, 34% 65%, 0 65%);
+    background: currentColor;
+    display: block;
+}
+
+.ses-sabit-btn[data-state$="-off"] {
+    color: #ff8b8b;
+    border-color: rgba(255, 71, 71, 0.68);
+}
+
+.ses-sabit-btn[data-state$="-off"]::after {
+    content: "";
+    position: absolute;
+    width: 30px;
+    height: 2px;
+    inset: auto;
+    opacity: 1;
+    border: 0;
+    border-radius: 2px;
+    background: #ff4747;
+    box-shadow: 0 0 8px rgba(255, 71, 71, 0.7);
+    transform: rotate(-42deg);
+}
+
+.harita-yolu {
+    position: absolute;
+    top: calc(24% + 78px);
+    left: 22%;
+    right: 22%;
+    height: 0;
+    z-index: 4;
+    border-top: 4px dashed rgba(90, 224, 255, 0.78);
+    background: none;
+    box-shadow: 0 0 14px rgba(90, 224, 255, 0.35);
+}
+
+.ana-gezegen,
+.kron-eglence {
+    height: 230px;
+}
+
+.gezegen-durum {
+    margin-top: 8px;
+    padding: 4px 9px;
+    border: 1px solid rgba(90, 224, 255, 0.45);
+    border-radius: 999px;
+    color: #55efc4;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    background: rgba(3, 8, 18, 0.68);
+    pointer-events: auto;
+}
+
+.harita-noktasi.kilitli {
+    opacity: 0.46;
+    filter: grayscale(0.8);
+}
+
+.harita-noktasi.kilitli .gezegen-durum {
+    color: #ff8b8b;
+    border-color: rgba(255, 71, 71, 0.48);
+}
+
+.harita-noktasi.kilitli .gezegen-kure,
+.harita-noktasi.kilitli .gezegen-isim {
+    cursor: not-allowed;
+}
+
+.hud-stat-panel {
+    flex: 0 0 330px;
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
+}
+
+.modul-gorev {
+    color: #55efc4;
+    font-size: 10px;
+    line-height: 1;
+}
+
+.oyun-bildirimi {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--hud-safe-top) + 16px);
+    z-index: 130;
+    padding: 8px 14px;
+    border: 1px solid rgba(90, 224, 255, 0.7);
+    border-radius: 6px;
+    background: rgba(3, 8, 18, 0.82);
+    color: #ffffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px;
+    pointer-events: none;
+    transform: translateX(-50%);
+    animation: bildirimUc 1.3s ease forwards;
+}
+
+@keyframes bildirimUc {
+    0% { opacity: 0; transform: translate(-50%, 8px); }
+    18% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -22px); }
+}
+
+.ogretici-panel {
+    width: min(920px, calc(100vw - 34px));
+    max-width: 920px;
+    max-height: calc(100vh - 44px);
+    overflow: auto;
+}
+
+.ogretici-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    text-align: left;
+}
+
+.ogretici-grid section {
+    border: 1px solid rgba(90, 224, 255, 0.24);
+    border-radius: 8px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.ogretici-grid h3 {
+    margin: 0 0 8px;
+    color: #55efc4;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+}
+
+.ogretici-grid p {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.35;
+}
+
+@media (max-width: 900px) {
+    :root {
+        --hud-safe-top: 190px;
+    }
+
+    .hud-stat-panel {
+        flex: 1 1 auto;
+        grid-template-columns: repeat(2, minmax(124px, 1fr));
+    }
+
+    .harita-yolu {
+        left: 18%;
+        right: 18%;
+    }
+
+    .ogretici-grid {
+        grid-template-columns: 1fr;
     }
 }
 

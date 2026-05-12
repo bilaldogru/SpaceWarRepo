@@ -1,25 +1,25 @@
-import { muzikBaslangic, muzikDurdurTum, sesleriAyarla } from './audio.js';
+import { muzikBaslangic, muzikDurdurTum, muzikCal, sesleriAyarla } from './audio.js';
 
-// Arayüz kontrol fonksiyonu
 export function arayuzuBaslat() {
     sesleriAyarla();
 
-    // Butonlar ve arayüz elemanları çekilir.
     const anaMenu = document.getElementById('ana-menu');
     const oyunAlani = document.getElementById('oyun-alani');
     const hakkindaAlani = document.getElementById('hakkinda-alani');
+    const ogreticiAlani = document.getElementById('ogretici-alani');
     const sesKontrolleri = document.getElementById('ses-kontrolleri');
 
     const baslaBtn = document.getElementById('basla-btn');
+    const ogreticiBtn = document.getElementById('ogretici-btn');
     const hakkindaBtn = document.getElementById('hakkinda-btn');
     const cikisBtn = document.getElementById('cikis-btn');
-
     const hakkindaGeriBtn = document.getElementById('hakkinda-geri-btn');
+    const ogreticiGeriBtn = document.getElementById('ogretici-geri-btn');
 
     const playBaslangic = () => {
         if (muzikBaslangic.paused) {
             muzikDurdurTum();
-            muzikBaslangic.play().catch(e => console.log("Müzik etkileşim bekliyor."));
+            muzikCal(muzikBaslangic);
         }
     };
 
@@ -29,34 +29,43 @@ export function arayuzuBaslat() {
         if (sesKontrolleri) sesKontrolleri.style.display = goster ? 'flex' : 'none';
     }
 
-    sesKontrolleriniGoster(true);
-
-    // yeni bir ekran açıldığında mevcut ekranların gizlenmesini sağlanır.
     function tumEkranlariGizle() {
         if (anaMenu) anaMenu.style.display = 'none';
         if (oyunAlani) oyunAlani.style.display = 'none';
         if (hakkindaAlani) hakkindaAlani.style.display = 'none';
+        if (ogreticiAlani) ogreticiAlani.style.display = 'none';
         sesKontrolleriniGoster(false);
     }
 
-    // butonların çalışması sağlanır.
+    function anaMenuyeDon() {
+        tumEkranlariGizle();
+        if (anaMenu) anaMenu.style.display = 'flex';
+        sesKontrolleriniGoster(true);
+        playBaslangic();
+    }
 
-    // Başla butonu
+    sesKontrolleriniGoster(true);
+
     baslaBtn?.addEventListener('click', () => {
         tumEkranlariGizle();
-        oyunAlani.style.display = 'flex';
+        if (oyunAlani) oyunAlani.style.display = 'flex';
         sesKontrolleriniGoster(true);
         playBaslangic();
     });
 
-    // Hakkında butonu
+    ogreticiBtn?.addEventListener('click', () => {
+        tumEkranlariGizle();
+        if (ogreticiAlani) ogreticiAlani.style.display = 'flex';
+        sesKontrolleriniGoster(true);
+        playBaslangic();
+    });
+
     hakkindaBtn?.addEventListener('click', () => {
         tumEkranlariGizle();
-        hakkindaAlani.style.display = 'flex';
+        if (hakkindaAlani) hakkindaAlani.style.display = 'flex';
         sesKontrolleriniGoster(false);
         playBaslangic();
 
-        // Hikayeyi dış dosyadan çekme
         fetch('Hikaye.txt')
             .then(response => response.text())
             .then(data => {
@@ -64,24 +73,18 @@ export function arayuzuBaslat() {
                 if (hikayeIcerik) hikayeIcerik.innerHTML = data;
             })
             .catch(err => {
-                console.error("Hikaye yüklenemedi:", err);
+                console.error('Hikaye yuklenemedi:', err);
                 const hikayeIcerik = document.getElementById('hikaye-icerik');
-                if (hikayeIcerik) hikayeIcerik.textContent = "Hikaye şu an yüklenemiyor...";
+                if (hikayeIcerik) hikayeIcerik.textContent = 'Hikaye su an yuklenemiyor...';
             });
     });
 
-    // Çıkış butonu
     cikisBtn?.addEventListener('click', () => {
-        if (confirm("Oyundan çıkmak istediğinize emin misiniz?")) {
-            window.location.href = "about:blank";
+        if (confirm('Oyundan cikmak istediginize emin misiniz?')) {
+            window.location.href = 'about:blank';
         }
     });
 
-
-    hakkindaGeriBtn?.addEventListener('click', () => {
-        tumEkranlariGizle();
-        anaMenu.style.display = 'flex';
-        sesKontrolleriniGoster(true);
-        playBaslangic();
-    });
+    hakkindaGeriBtn?.addEventListener('click', anaMenuyeDon);
+    ogreticiGeriBtn?.addEventListener('click', anaMenuyeDon);
 }

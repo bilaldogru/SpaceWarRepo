@@ -3,30 +3,35 @@ import { noraBolumu } from './nora.js';
 import { vegaBolumu } from './vega.js';
 import { kronBolumu } from './kron.js';
 import { NormalEnemy, HighEnemy, QueenEnemy } from './enemy.js';
-import { muzikBaslangic, muzikSakin, muzikAksiyon, muzikDurdurTum } from './audio.js';
+import { muzikBaslangic, muzikSakin, muzikAksiyon, muzikDurdurTum, muzikCal } from './audio.js';
 import { mermileriTemizle } from './projectile.js';
 export let aktifBolum = null;
 
 const taretBilgileri = [
     {
-        ad: 'Blaster Modulu',
-        aciklama: 'Cekirdegin etrafina baglanir ve yakindaki dusmanlara otomatik ates eder.'
+        ad: 'Yavaslatici Taret',
+        gorev: 'Yakinindaki dusmanlari yavaslatir.',
+        aciklama: 'Etki alanindaki dusmanlarin hareket hizini belirli oranda dusurur.'
     },
     {
-        ad: 'Seri Namlu',
-        aciklama: 'Daha dusuk hasarli ama daha sik ates eden destek moduludur.'
+        ad: 'Hizli Atis Tareti',
+        gorev: 'Kisa araliklarla hizli ates eder.',
+        aciklama: 'Dusmanlara seri mermi gonderir. Tek atis hasari dusuk, saldiri hizi yuksektir.'
     },
     {
-        ad: 'Zincir Modulu',
-        aciklama: 'Vurdugu hedefin yakinindaki baska dusmanlara da hasar aktarir.'
+        ad: 'Can Destek Tareti',
+        gorev: 'Alan icinde oyuncunun canini yeniler.',
+        aciklama: 'Etki alanina girildiginde oyuncunun cani belirli miktarda artar.'
     },
     {
-        ad: 'Zirh Modulu',
-        aciklama: 'Yavas ates eder ama cekirdegi koruyan ekstra govde gibi davranir.'
+        ad: 'Hiz Destek Tareti',
+        gorev: 'Oyuncunun hareket hizini artirir.',
+        aciklama: 'Etki alanina girildiginde oyuncu alan icinde daha hizli hareket eder.'
     },
     {
-        ad: 'Nabiz Modulu',
-        aciklama: 'Patlama etkili atislarla kalabalik dalgalari temizlemeye yardim eder.'
+        ad: 'Sinirsiz Mermi Tareti',
+        gorev: 'Belirli bolgede gecici sinirsiz mermi saglar.',
+        aciklama: 'Oyuncu etki alanindayken sure boyunca mermi harcamadan ates eder.'
     }
 ];
 
@@ -48,7 +53,7 @@ function taretleriGuncelle(acikSayisi) {
     const slotlar = document.querySelectorAll('.taret-slot');
     slotlar.forEach((slot, index) => {
         const bilgi = taretBilgileri[index];
-        slot.title = bilgi ? `${bilgi.ad}: ${bilgi.aciklama}` : '';
+        slot.title = bilgi ? `${bilgi.ad}: ${bilgi.gorev} ${bilgi.aciklama}` : '';
 
         if (index < acikSayisi) {
             slot.classList.remove('kilitli');
@@ -56,6 +61,33 @@ function taretleriGuncelle(acikSayisi) {
             slot.classList.add('kilitli');
         }
     });
+}
+
+function haritaIlerlemesi() {
+    return Math.max(1, Math.min(3, Number(localStorage.getItem('spacewarUnlockedStage') || 1)));
+}
+
+function haritaIlerlemesiniCiz() {
+    const acikAsama = haritaIlerlemesi();
+    document.querySelectorAll('.ana-gezegen').forEach(gezegen => {
+        const asama = Number(gezegen.dataset.stage || 1);
+        const acik = asama <= acikAsama;
+        gezegen.classList.toggle('kilitli', !acik);
+        const durum = gezegen.querySelector('.gezegen-durum');
+        if (durum) durum.textContent = acik ? 'Acik' : 'Kilitli';
+    });
+}
+
+function oyunBildirimiGoster(metin) {
+    const oyunAlani = document.getElementById('oyun-alani');
+    if (!oyunAlani) return;
+    const eski = oyunAlani.querySelector('.oyun-bildirimi');
+    if (eski) eski.remove();
+    const bildirim = document.createElement('div');
+    bildirim.className = 'oyun-bildirimi';
+    bildirim.textContent = metin;
+    oyunAlani.appendChild(bildirim);
+    setTimeout(() => bildirim.remove(), 1400);
 }
 
 function modulSlotTiklamalariniBagla() {
@@ -101,34 +133,37 @@ export function bolumleriBaslat() {
     const bolumAyarlari = {
         astra: {
             bolum: astraBolumu,
+            stage: 1,
             asama: 'Asama 1',
             taretSayisi: 2,
             maxTurnLabel: '5',
-            metin: 'Astra moduler savasin girisidir. Cekirdege baglanan modullerle dusman dalgalarini temizle ve hayatta kal.',
+            metin: 'Astra savasin girisidir. Yavaslatici ve hizli atis taretleriyle dusman dalgalarini temizle ve hayatta kal.',
             arkaPlan: 'rgba(22, 5, 30, 0.9)'
         },
         vega: {
             bolum: vegaBolumu,
+            stage: 2,
             asama: 'Asama 2',
             taretSayisi: 3,
             maxTurnLabel: '6',
-            metin: 'Vega seri ve zincir modullerinin acildigi daha hizli bir arenadir. Dusmanlar her yonden cekirdege gelir.',
+            metin: 'Vega can destek taretinin acildigi daha hizli bir arenadir. Dusmanlar her yonden gelir.',
             arkaPlan: 'rgba(5, 20, 35, 0.95)'
         },
         nora: {
             bolum: noraBolumu,
+            stage: 3,
             asama: 'Asama 3',
-            taretSayisi: 4,
+            taretSayisi: 5,
             maxTurnLabel: '7',
-            metin: 'Nora daha agir dusmanlar ve zirh moduluyle oynanir. Modulleri kaybetmeden dalga dalga gelen hedefleri yok et.',
+            metin: 'Nora daha agir dusmanlar, hiz destek ve sinirsiz mermi etkileriyle oynanir. Taretlerini koruyarak hedefleri yok et.',
             arkaPlan: 'rgba(5, 5, 5, 0.95)'
         },
         kron: {
             bolum: kronBolumu,
             asama: 'Eglence Modu',
             taretSayisi: 5,
-            maxTurnLabel: '∞',
-            metin: 'Kron sonsuz moddur. Tum moduller acik, dalgalar bitmez; cekirdek parcalanana kadar en yuksek skoru kovala.',
+            maxTurnLabel: 'Sonsuz',
+            metin: 'Kron sonsuz eglence modudur. Tum taretler acik, dalgalar bitmez; can bitene kadar en yuksek skoru kovala.',
             arkaPlan: 'rgba(10, 20, 10, 0.95)'
         }
     };
@@ -147,7 +182,7 @@ export function bolumleriBaslat() {
                         <div class="bilgi-taret-numara">${index + 1}</div>
                         <div>
                             <strong>${taret.ad}</strong>
-                            <span>${taret.aciklama}</span>
+                            <span>${taret.gorev} ${taret.aciklama}</span>
                         </div>
                         <div class="bilgi-taret-durum">${acik ? 'Acik' : 'Kapali'}</div>
                     </div>
@@ -175,14 +210,13 @@ export function bolumleriBaslat() {
         canvas.style.boxShadow = `inset 0 0 150px ${aktifBolum.renk}`;
 
         muzikDurdurTum();
-        if (ayar.bolum === kronBolumu) {
-            muzikAksiyon.play().catch(e => console.log(e));
-        } else {
-            muzikSakin.play().catch(e => console.log(e));
-        }
+        muzikCal(ayar.bolum === kronBolumu ? muzikAksiyon : muzikSakin);
     }
 
     kronSkorunuGuncelle();
+    haritaIlerlemesiniCiz();
+    window.addEventListener('storage', haritaIlerlemesiniCiz);
+    window.addEventListener('spacewar-ilerleme-guncellendi', haritaIlerlemesiniCiz);
     window.addEventListener('kron-skor-guncellendi', kronSkorunuGuncelle);
 
     bilgiBaslat?.addEventListener('click', () => {
@@ -194,9 +228,17 @@ export function bolumleriBaslat() {
         if (bilgiPaneli) bilgiPaneli.style.display = 'none';
     });
 
-    astraGezegeni?.addEventListener('click', () => bilgiPaneliniAc(bolumAyarlari.astra));
-    vegaGezegeni?.addEventListener('click', () => bilgiPaneliniAc(bolumAyarlari.vega));
-    noraGezegeni?.addEventListener('click', () => bilgiPaneliniAc(bolumAyarlari.nora));
+    function anaGezegeniAc(ayar) {
+        if (ayar.stage && ayar.stage > haritaIlerlemesi()) {
+            oyunBildirimiGoster('Once onceki gezegeni tamamla.');
+            return;
+        }
+        bilgiPaneliniAc(ayar);
+    }
+
+    astraGezegeni?.addEventListener('click', () => anaGezegeniAc(bolumAyarlari.astra));
+    vegaGezegeni?.addEventListener('click', () => anaGezegeniAc(bolumAyarlari.vega));
+    noraGezegeni?.addEventListener('click', () => anaGezegeniAc(bolumAyarlari.nora));
     kronGezegeni?.addEventListener('click', () => bilgiPaneliniAc(bolumAyarlari.kron));
 
     hudMenuBtn?.addEventListener('click', () => {
@@ -218,7 +260,8 @@ export function bolumleriBaslat() {
         canvas.style.boxShadow = 'none';
 
         muzikDurdurTum();
-        muzikBaslangic.play().catch(e => console.log(e));
+        haritaIlerlemesiniCiz();
+        muzikCal(muzikBaslangic);
     });
 }
 
