@@ -20,7 +20,7 @@ body {
     -moz-user-select: none;
     -ms-user-select: none;
     /* Fare imlecini değiştirme */
-    cursor: url('assets/images/imlec.png') 32 32, auto;
+    cursor: url('../assets/images/imlec.png') 32 32, auto;
 }
 
 #yildiz-alani {
@@ -31,7 +31,7 @@ body {
     height: 100%;
     z-index: 1;
     /* Fare imlecini değiştirme */
-    cursor: url('assets/images/imlec.png') 32 32, crosshair;
+    cursor: url('../assets/images/imlec.png') 32 32, crosshair;
 }
 
 /* Sabit ses kontrol paneli — tüm ekranlarda görünür */
@@ -371,7 +371,7 @@ body {
 .astra .gezegen-kure {
     width: 120px;
     height: 120px;
-    background-image: url('assets/images/gezegen1.png');
+    background-image: url('../assets/images/gezegen1.png');
     /* Resmin kesilmeden tam sığması için 'cover' yerine 'contain' yaptık */
     background-size: contain;
     background-repeat: no-repeat;
@@ -384,7 +384,7 @@ body {
 .vega .gezegen-kure {
     width: 90px;
     height: 90px;
-    background-image: url('assets/images/gezegen2.png');
+    background-image: url('../assets/images/gezegen2.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -396,7 +396,7 @@ body {
 .nora .gezegen-kure {
     width: 150px;
     height: 150px;
-    background-image: url('assets/images/gezegen3.png');
+    background-image: url('../assets/images/gezegen3.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -408,7 +408,7 @@ body {
 .kron .gezegen-kure {
     width: 130px;
     height: 130px;
-    background-image: url('assets/images/gezegen4.png');
+    background-image: url('../assets/images/gezegen4.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -989,7 +989,7 @@ body {
 .gezegen-kure,
 .gezegen-isim,
 .taret-slot {
-    cursor: url('assets/images/imlec.png') 32 32, crosshair;
+    cursor: url('../assets/images/imlec.png') 32 32, crosshair;
 }
 
 .ses-sabit-btn[data-state="music-on"]::before,
