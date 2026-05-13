@@ -164,6 +164,7 @@ export function createModularLevel(config) {
         moduleShots: [],
         pickups: [],
         chainEffects: [],
+        particles: [],
         skorYazilari: [],
         modules: [],
         spawnQueue: [],
@@ -175,6 +176,8 @@ export function createModularLevel(config) {
         comboBitis: 0,
         sonOyuncuHasarZamani: -10,
         enIyiSkorGuncellendi: false,
+        maxCombo: 1,
+        alinanHasar: 0,
         dusmanDagilimi: config.dusmanDagilimi,
         acikModulSayisi: config.acikModulSayisi,
         maxModuleSayisi: config.maxModuleSayisi,
@@ -219,6 +222,7 @@ export function createModularLevel(config) {
             this.moduleShots = [];
             this.pickups = [];
             this.chainEffects = [];
+            this.particles = [];
             this.skorYazilari = [];
             this.modules = [];
             this.spawnQueue = [];
@@ -227,6 +231,8 @@ export function createModularLevel(config) {
             this.dalgaToplamDusman = 0;
             this.killCount = 0;
             this.combo = 1;
+            this.maxCombo = 1;
+            this.alinanHasar = 0;
             this.comboBitis = 0;
             this.sonOyuncuHasarZamani = -10;
             this.enIyiSkorGuncellendi = false;
@@ -253,6 +259,7 @@ export function createModularLevel(config) {
             this.moduleShots = [];
             this.pickups = [];
             this.chainEffects = [];
+            this.particles = [];
             this.skorYazilari = [];
             this.spawnQueue = [];
             this.aktifSatinAlimlar = [];
@@ -525,7 +532,7 @@ export function createModularLevel(config) {
                 ? `Doluyor ${Math.ceil(kalanDolum / 1000)}sn`
                 : this.sinirsizMermiAktifMi()
                     ? 'Sinirsiz'
-                : `${this.mermi}/${this.maxMermi}`;
+                    : `${this.mermi}/${this.maxMermi}`;
             if (hudPara) hudPara.textContent = this.para;
             if (hudSkor) hudSkor.textContent = this.skor;
             if (hudKombo) hudKombo.textContent = `x${this.combo}`;
@@ -535,6 +542,17 @@ export function createModularLevel(config) {
             if (hudDusman) hudDusman.textContent = kalanDusman;
             if (hudDusmanKalan) hudDusmanKalan.textContent = `${kalanDusman}/${dalgaToplam}`;
             if (hudDusmanBar) hudDusmanBar.style.width = `${dusmanOrani * 100}%`;
+
+            const canBar = document.getElementById('hud-can-bar');
+            if (canBar) canBar.style.width = `${clamp(this.can / this.maxCan, 0, 1) * 100}%`;
+
+            const comboEl = document.getElementById('hud-kombo-gosterge');
+            if (comboEl) {
+                const c = Math.min(this.combo, 9);
+                comboEl.textContent = `x${this.combo}`;
+                comboEl.dataset.combo = c;
+            }
+
             this.modulSlotlariniGuncelle();
         },
 
@@ -625,7 +643,7 @@ export function createModularLevel(config) {
 
             this.chainEffects.push({
                 x1: vuruldusan.x, y1: vuruldusan.y,
-                x2: hedef.x,      y2: hedef.y,
+                x2: hedef.x, y2: hedef.y,
                 noktalar,
                 baslangic: performance.now(),
                 sure: 380,
@@ -689,6 +707,34 @@ export function createModularLevel(config) {
                 baslangic: performance.now(),
                 sure: 900
             });
+            this.patlamaOlustur(dusman);
+        },
+
+        patlamaOlustur(dusman) {
+            const renkler = {
+                '1': '#ff4d6d',
+                '2': '#ff8c00',
+                '3': '#8b5cf6',
+                '4': '#f9ca24',
+                '5': '#ffffff'
+            };
+            const renk = renkler[String(dusman.tip)] || '#ff4d6d';
+            const adet = dusman.tip >= 4 ? 18 : 10;
+            const simdi = performance.now();
+            for (let i = 0; i < adet; i++) {
+                const aci = (Math.PI * 2 / adet) * i + Math.random() * 0.5;
+                const hiz = 1.2 + Math.random() * 2.8;
+                this.particles.push({
+                    x: dusman.x,
+                    y: dusman.y,
+                    hizX: Math.cos(aci) * hiz,
+                    hizY: Math.sin(aci) * hiz,
+                    r: 3 + Math.random() * 3,
+                    renk,
+                    baslangic: simdi,
+                    sure: 480 + Math.random() * 280
+                });
+            }
         },
 
         dusmanGuncelle(canvas, dusman) {
@@ -777,7 +823,9 @@ export function createModularLevel(config) {
                 }
 
                 if (mesafe(lazer, { x: gemi.x, y: gemi.y, boyut: gemi.genislik }) < 26) {
-                    this.can -= lazer.hasar;
+                    const hasar = lazer.hasar;
+                    this.can -= hasar;
+                    this.alinanHasar += hasar;
                     this.sonOyuncuHasarZamani = this.gecenSure;
                     this.lazerler.splice(i, 1);
                     continue;
@@ -841,7 +889,9 @@ export function createModularLevel(config) {
                 }
 
                 if (daireCarpisti(dusman, { x: gemi.x, y: gemi.y, boyut: gemi.genislik }, 2)) {
-                    this.can -= 18 + Number(dusman.tip) * 4;
+                    const hasar = 18 + Number(dusman.tip) * 4;
+                    this.can -= hasar;
+                    this.alinanHasar += hasar;
                     this.sonOyuncuHasarZamani = this.gecenSure;
                     this.dusmanlar.splice(i, 1);
                 }
@@ -852,7 +902,10 @@ export function createModularLevel(config) {
 
             this.skorYazilari = this.skorYazilari.filter(yazi => simdi - yazi.baslangic < yazi.sure);
 
-            if (performance.now() > this.comboBitis) this.combo = 1;
+            if (performance.now() > this.comboBitis) {
+                if (this.combo > this.maxCombo) this.maxCombo = this.combo;
+                this.combo = 1;
+            }
 
             if (this.spawnQueue.length === 0 && this.dusmanlar.length === 0) {
                 if (!this.endless && this.turn >= this.maxTurn) {
@@ -997,6 +1050,7 @@ export function createModularLevel(config) {
             });
 
             this.chainEffekleriniCiz(ctx);
+            this.parcaciklariCiz(ctx);
             drawEnemyLasers(ctx, this.lazerler);
             drawSquareEnemies(ctx, this.dusmanlar, this.canBariCiz.bind(this));
 
@@ -1051,6 +1105,27 @@ export function createModularLevel(config) {
             });
         },
 
+        parcaciklariCiz(ctx) {
+            const simdi = performance.now();
+            this.particles = this.particles.filter(p => simdi - p.baslangic < p.sure);
+            this.particles.forEach(p => {
+                const oran = (simdi - p.baslangic) / p.sure;
+                p.x += p.hizX;
+                p.y += p.hizY;
+                p.hizX *= 0.94;
+                p.hizY *= 0.94;
+                ctx.save();
+                ctx.globalAlpha = (1 - oran) * 0.88;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r * (1 - oran * 0.6), 0, Math.PI * 2);
+                ctx.fillStyle = p.renk;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = p.renk;
+                ctx.fill();
+                ctx.restore();
+            });
+        },
+
         haritaIzgarasiCiz(ctx) {
             ctx.save();
             ctx.strokeStyle = this.gridRengi;
@@ -1096,20 +1171,104 @@ export function createModularLevel(config) {
         },
 
         oyunSonuEkraniCiz(ctx, canvas) {
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const kazandi = this.oyunKazanildi;
+            const renkAna = kazandi ? '#55efc4' : '#ff4d6d';
+            const sure = sureyiYaz(this.gecenSure);
+
+            // Arka plan overlay
             ctx.save();
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.72)';
+            ctx.fillStyle = 'rgba(4, 9, 20, 0.88)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.textAlign = 'center';
-            ctx.font = "700 56px 'Orbitron', sans-serif";
-            ctx.fillStyle = this.oyunKazanildi ? '#55efc4' : '#ff4747';
-            ctx.shadowBlur = 28;
-            ctx.shadowColor = ctx.fillStyle;
-            ctx.fillText(this.oyunKazanildi ? 'DALGALAR TEMIZLENDI' : 'CAN BITTI', canvas.width / 2, canvas.height / 2 - 28);
-            ctx.font = "700 24px 'Rajdhani', sans-serif";
-            ctx.fillStyle = '#ffffff';
+
+            // Kart boyutlari
+            const kW = Math.min(560, canvas.width - 48);
+            const kH = 370;
+            const kX = cx - kW / 2;
+            const kY = cy - kH / 2;
+            const r = 14;
+
+            // Kart arka plani (glassmorphism)
+            ctx.beginPath();
+            ctx.moveTo(kX + r, kY);
+            ctx.lineTo(kX + kW - r, kY);
+            ctx.arcTo(kX + kW, kY, kX + kW, kY + r, r);
+            ctx.lineTo(kX + kW, kY + kH - r);
+            ctx.arcTo(kX + kW, kY + kH, kX + kW - r, kY + kH, r);
+            ctx.lineTo(kX + r, kY + kH);
+            ctx.arcTo(kX, kY + kH, kX, kY + kH - r, r);
+            ctx.lineTo(kX, kY + r);
+            ctx.arcTo(kX, kY, kX + r, kY, r);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(7, 16, 30, 0.92)';
+            ctx.fill();
+            ctx.strokeStyle = `${renkAna}66`;
+            ctx.lineWidth = 1.5;
+            ctx.shadowBlur = 30;
+            ctx.shadowColor = renkAna;
+            ctx.stroke();
             ctx.shadowBlur = 0;
-            ctx.fillText(`Skor: ${this.skor} | Para: ${this.para} | Sure: ${sureyiYaz(this.gecenSure)} | Taret: ${this.modules.length}`, canvas.width / 2, canvas.height / 2 + 24);
-            ctx.fillText('Menuye donerek baska gezegende daha zor dalgalari deneyebilirsin', canvas.width / 2, canvas.height / 2 + 62);
+
+            // Baslik
+            ctx.textAlign = 'center';
+            ctx.font = "900 38px 'Orbitron', sans-serif";
+            ctx.fillStyle = renkAna;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = renkAna;
+            ctx.fillText(kazandi ? 'DALGALAR TEMİZLENDİ' : 'GEMİ YOK OLDU', cx, kY + 52);
+            ctx.shadowBlur = 0;
+
+            // Ayirac cizgi
+            ctx.strokeStyle = `${renkAna}44`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(kX + 24, kY + 70);
+            ctx.lineTo(kX + kW - 24, kY + 70);
+            ctx.stroke();
+
+            // Istatistik satirlari
+            const satirlar = [
+                { etiket: 'TOPLAM SÜRE',     deger: sure,                               renk: '#41e0ff' },
+                { etiket: 'YOK EDİLEN',      deger: `${this.killCount} düşman`,         renk: '#ffffff' },
+                { etiket: 'EN YÜKSEK KOMBO', deger: `x${this.maxCombo}`,               renk: this.maxCombo >= 7 ? '#ff4d6d' : this.maxCombo >= 4 ? '#ff8c00' : '#f9ca24' },
+                { etiket: 'TOPLAM SKOR',     deger: this.skor.toLocaleString(),         renk: '#ffffff' },
+                { etiket: 'KAZANILAN PARA',  deger: `${this.para} kr`,                  renk: '#f9ca24' },
+                { etiket: 'ALINAN HASAR',    deger: `${Math.round(this.alinanHasar)}`,  renk: '#ff4d6d' },
+            ];
+
+            const satirBasY = kY + 100;
+            const satirAraligi = 38;
+            ctx.font = "500 15px 'Orbitron', sans-serif";
+
+            satirlar.forEach((satir, i) => {
+                const satY = satirBasY + i * satirAraligi;
+                // Etiket
+                ctx.textAlign = 'left';
+                ctx.fillStyle = 'rgba(160,180,210,0.65)';
+                ctx.fillText(satir.etiket, kX + 36, satY);
+                // Deger
+                ctx.textAlign = 'right';
+                ctx.fillStyle = satir.renk;
+                ctx.shadowBlur = satir.renk !== '#ffffff' ? 10 : 0;
+                ctx.shadowColor = satir.renk;
+                ctx.fillText(satir.deger, kX + kW - 36, satY);
+                ctx.shadowBlur = 0;
+                // Alt cizgi
+                ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(kX + 24, satY + 10);
+                ctx.lineTo(kX + kW - 24, satY + 10);
+                ctx.stroke();
+            });
+
+            // Alt ipucu
+            ctx.textAlign = 'center';
+            ctx.font = "500 12px 'Orbitron', sans-serif";
+            ctx.fillStyle = 'rgba(255,255,255,0.28)';
+            ctx.fillText('[ ESC / ENTER ]  →  Ana Menüye Dön', cx, kY + kH - 18);
+
             ctx.restore();
         }
     };

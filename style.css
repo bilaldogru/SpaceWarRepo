@@ -915,6 +915,59 @@ body {
     transition: width 0.2s ease;
 }
 
+/* Combo Gostergesi */
+.hud-combo-block {
+    flex: 0 0 72px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 2px;
+}
+
+.combo-val {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    transition: color 0.3s ease, text-shadow 0.3s ease, transform 0.15s ease;
+    display: block;
+}
+
+.combo-val[data-combo="1"] {
+    color: rgba(255,255,255,0.25);
+    text-shadow: none;
+    transform: scale(0.9);
+}
+
+.combo-val[data-combo="2"],
+.combo-val[data-combo="3"] {
+    color: #f9ca24;
+    text-shadow: 0 0 12px rgba(249,202,36,0.7);
+    transform: scale(1);
+}
+
+.combo-val[data-combo="4"],
+.combo-val[data-combo="5"],
+.combo-val[data-combo="6"] {
+    color: #ff8c00;
+    text-shadow: 0 0 16px rgba(255,140,0,0.8);
+    transform: scale(1.05);
+}
+
+.combo-val[data-combo="7"],
+.combo-val[data-combo="8"],
+.combo-val[data-combo="9"] {
+    color: var(--clr-danger);
+    text-shadow: 0 0 20px rgba(255,77,109,0.9);
+    transform: scale(1.12);
+    animation: combo-pulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes combo-pulse {
+    from { text-shadow: 0 0 14px rgba(255,77,109,0.7); transform: scale(1.1); }
+    to   { text-shadow: 0 0 30px rgba(255,77,109,1), 0 0 60px rgba(255,77,109,0.4); transform: scale(1.18); }
+}
+
 /* Responsive — 900px */
 @media (max-width: 900px) {
     :root { --hud-safe-top: 52px; }
