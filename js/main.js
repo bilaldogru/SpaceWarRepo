@@ -67,7 +67,13 @@ window.addEventListener('keydown', (olay) => {
             mermiAtesle(gemi, aktifBolum);
         }
     }
+
+    // Oyun bitti ekraninda Escape veya Enter ile menuye don
+    if ((olay.key === 'Escape' || olay.key === 'Enter') && aktifBolum?.oyunBitti) {
+        document.getElementById('hud-ana-menu-btn')?.click();
+    }
 });
+
 
 function yildizlariCiz() {
     for (let i = 0; i < yildizSayisi; i++) {

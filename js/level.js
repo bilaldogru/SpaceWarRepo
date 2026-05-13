@@ -32,6 +32,11 @@ const taretBilgileri = [
         ad: 'Sinirsiz Mermi Tareti',
         gorev: 'Belirli bolgede gecici sinirsiz mermi saglar.',
         aciklama: 'Oyuncu etki alanindayken sure boyunca mermi harcamadan ates eder.'
+    },
+    {
+        ad: 'Yildirim Zinciri',
+        gorev: 'Sadece Nora\'da aktif. Bir dusmana isabet edince en yakin diger dusmana simsek carpar.',
+        aciklama: 'Zincirleme elektrik hasari verir. Efekti gormek icin modulu haritaya birakip dusmanlarin arasinda kal.'
     }
 ];
 
@@ -153,9 +158,9 @@ export function bolumleriBaslat() {
             bolum: noraBolumu,
             stage: 3,
             asama: 'Asama 3',
-            taretSayisi: 5,
+            taretSayisi: 6,
             maxTurnLabel: '7',
-            metin: 'Nora daha agir dusmanlar, hiz destek ve sinirsiz mermi etkileriyle oynanir. Taretlerini koruyarak hedefleri yok et.',
+            metin: 'Nora en zorlu gezegendir. Yildirim Zinciri dahil 6 taret actir. Dusmanlar hizli ve sert gelir.',
             arkaPlan: 'rgba(5, 5, 5, 0.95)'
         },
         kron: {
