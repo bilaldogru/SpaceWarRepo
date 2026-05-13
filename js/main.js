@@ -1,8 +1,8 @@
-import { arayuzuBaslat } from './ui.js';
-import { gemi, gemiGorseli, gemiyiGuncelle, gemiyiCiz } from './player.js';
-import { mermiAtesle, mermiler, mermileriGuncelleVeCiz } from './projectile.js';
+import { arayuzuBaslat } from './core/ui.js';
+import { gemi, gemiGorseli, gemiyiGuncelle, gemiyiCiz } from './core/player.js';
+import { mermiAtesle, mermiler, mermileriGuncelleVeCiz } from './core/projectile.js';
 import { aktifBolum, bolumleriBaslat } from './level.js';
-import { fare } from './input.js';
+import { fare } from './core/input.js';
 
 const canvas = document.getElementById('yildiz-alani');
 const ctx = canvas.getContext('2d');

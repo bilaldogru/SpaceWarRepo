@@ -1,10 +1,10 @@
-import { astraBolumu } from './astra.js';
-import { noraBolumu } from './nora.js';
-import { vegaBolumu } from './vega.js';
-import { kronBolumu } from './kron.js';
-import { NormalEnemy, HighEnemy, QueenEnemy } from './enemy.js';
-import { muzikBaslangic, muzikSakin, muzikAksiyon, muzikDurdurTum, muzikCal } from './audio.js';
-import { mermileriTemizle } from './projectile.js';
+import { astraBolumu } from './levels/astra.js';
+import { noraBolumu } from './levels/nora.js';
+import { vegaBolumu } from './levels/vega.js';
+import { kronBolumu } from './levels/kron.js';
+import { NormalEnemy, HighEnemy, QueenEnemy } from './core/enemy.js';
+import { muzikBaslangic, muzikSakin, muzikAksiyon, muzikDurdurTum, muzikCal } from './core/audio.js';
+import { mermileriTemizle } from './core/projectile.js';
 export let aktifBolum = null;
 
 const taretBilgileri = [

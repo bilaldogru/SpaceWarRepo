@@ -1,4 +1,4 @@
-import { createModularLevel } from './modularLevel.js';
+import { createModularLevel } from '../core/modularLevel.js';
 
 export const vegaBolumu = createModularLevel({
     isim: 'Vega',
