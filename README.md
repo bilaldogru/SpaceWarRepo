@@ -130,24 +130,6 @@ SpaceWarRepo/
 ├── index.html            # Ana HTML dosyası
 └── README.md             # Proje tanıtımı
 ```
-
-## Çalıştırma
-
-Proje ES module kullandığı için dosyayı doğrudan çift tıklamak yerine küçük bir yerel sunucu ile açmak daha sağlıklıdır.
-Python kuruluysa proje klasöründe şu komutu çalıştırabilirsiniz:
-
-```bash
-python -m http.server 4174
-```
-
-Ardından Chrome veya Firefox tarayıcısından şu adresi açın:
-
-```text
-http://127.0.0.1:4174/  veya http://localhost:4174
-```
-
-Node.js kullananlar için benzer şekilde herhangi bir statik sunucu da yeterlidir. Oyun test edilirken gemi hareketi, fareyle nişan alma, sol tık ve `Space` ile ateş etme, `R` ile yeniden doldurma, taret sürükle-bırak davranışı, ses butonları ve oyun bitti ekranından menüye dönüş davranışı iki tarayıcıda da kontrol edilmelidir.
-
 ## Ekran Görüntüleri
 
 ![Ana menü ve uzay teması](assets/images/ekran-goruntusu-1.png)
@@ -177,7 +159,7 @@ Space War ile bu referanstaki modüler savunma ve dalga baskısı fikrini uzay t
 ## Bağlantılar
 
 - GitHub repo: [https://github.com/bilaldogru/SpaceWarRepo](https://github.com/bilaldogru/SpaceWarRepo)
-- Yerel test adresi: [http://127.0.0.1:4174/](http://127.0.0.1:4174/) - [http://localhost:4174/](http://localhost:4174/)
+- Oyun linki : https://bilaldogru.github.io/SpaceWarRepo
 
 ## Geliştirme Notları
 
