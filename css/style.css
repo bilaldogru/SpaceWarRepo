@@ -1,0 +1,1542 @@
+* {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* 
+  Sayfanın genel yapısını (arka plan rengi, yazı tipi, tam ekran olma durumu) belirler. 
+  Neden kullanılır: Oyunun tarayıcıda scroll (kaydırma) çubuğu olmadan tam ekran çalışmasını sağlamak için.
+*/
+body {
+    background-color: #0b101e;
+    font-family: 'Rajdhani', sans-serif;
+    color: white;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Metin seçimini engelleme */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    /* Fare imlecini değiştirme */
+    cursor: url('../assets/images/imlec.png') 32 32, auto;
+}
+
+#yildiz-alani {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    /* Fare imlecini değiştirme */
+    cursor: url('../assets/images/imlec.png') 32 32, crosshair;
+}
+
+/* Sabit ses kontrol paneli — tüm ekranlarda görünür */
+#ses-kontrolleri {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 9999;
+    display: none;
+    gap: 8px;
+    pointer-events: auto;
+}
+
+.ses-sabit-btn {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    width: 44px;
+    height: 44px;
+    min-width: unset;
+    font-size: 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    letter-spacing: 0;
+    background: rgba(11, 25, 44, 0.85);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(90, 224, 255, 0.55);
+    box-shadow: 0 0 12px rgba(90, 224, 255, 0.15);
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.ses-sabit-btn:hover {
+    background: rgba(90, 224, 255, 0.2);
+    box-shadow: 0 0 18px rgba(90, 224, 255, 0.4);
+    border-color: #ffffff;
+    transform: scale(1.08);
+}
+
+
+/* 
+  Oyun menülerinin ekranın tam ortasında durmasını sağlayan kapsayıcı.
+  Neden kullanılır: Tüm alt içeriklerin hizada ve merkezde kalmasını kolaylaştırmak için.
+*/
+.arayuz-kapsayici {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.ekran-icerigi {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Ekran içerikleri için Fade-In (Yumuşak Geçiş) efekti. 
+   Elemanın şeffaflığını (opacity) 0'dan 1'e çıkarırken, Y ekseninde -10 pikselden orijinal konumuna (0) kaydırır. */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.baslik-kapsayici {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+/* 
+  "SPACE" metninin stilini belirler (Eğimli, parlak, büyük harfler).
+  Neden kullanılır: Bilimkurgu ve uzay temasına uygun neon bir başlık efekti yaratmak için.
+*/
+.baslik-space {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 90px;
+    font-weight: 900;
+    letter-spacing: 10px;
+    font-style: italic;
+    background: linear-gradient(to bottom, #ffffff, #5ae0ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(90, 224, 255, 0.4);
+    line-height: 0.9;
+    margin-left: 10px;
+}
+
+/* 
+  "WAR" metninin stilini belirler (Kırmızı, parlak, alt satırda).
+  Neden kullanılır: SPACE kelimesiyle kontrast oluşturup savaş temasını vurgulamak için.
+*/
+.baslik-war {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 45px;
+    font-weight: 700;
+    letter-spacing: 15px;
+    color: #ff4747;
+    text-shadow: 0 0 20px rgba(255, 71, 71, 0.6);
+    margin-top: -50px;
+}
+
+.buton-grubu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 250px;
+}
+
+/* 
+  Oyundaki (menülerdeki) tüm standart butonların ortak tasarım sınıfı.
+  Neden kullanılır: Butonların hepsinde tutarlı bir bilimkurgu görünümü (neon mavi çerçeve, hover efekti) sağlamak için.
+*/
+.oyun-butonu {
+    background-color: rgba(11, 25, 44, 0.7);
+    border: 1px solid #5ae0ff;
+    color: #5ae0ff;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    padding: 15px 30px;
+    /* Standart pointer: tıklanabilir alan tam dikdörtgenle örtüşür */
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 2px;
+}
+
+.oyun-butonu:hover {
+    background-color: rgba(90, 224, 255, 0.2);
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(90, 224, 255, 0.5), inset 0 0 10px rgba(90, 224, 255, 0.3);
+    transform: scale(1.05);
+    border-color: #ffffff;
+}
+
+.oyun-butonu:active {
+    transform: scale(0.95);
+}
+
+.kucuk-buton {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-top: 30px;
+    width: auto;
+}
+
+/* 
+  Öğretici gibi büyük metin içerikli menülerin arka plan kutusudur.
+  Neden kullanılır: Arkası hafif bulanık (blur) olan, yarı saydam şık bir panel görünümü elde etmek için.
+*/
+.panel-kutusu {
+    background: rgba(10, 15, 30, 0.85);
+    border: 1px solid rgba(90, 224, 255, 0.3);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 50px;
+    max-width: 600px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(90, 224, 255, 0.1);
+}
+
+.panel-baslik {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 36px;
+    color: #5ae0ff;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(90, 224, 255, 0.5);
+}
+
+.panel-metin {
+    font-size: 22px;
+    color: #d1d8e0;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+/* =======================================================
+   TAKTİKSEL GEZEGEN HARİTASI (SEÇİM EKRANI) CSS KODLARI
+   ======================================================= */
+
+.gezegen-haritasi {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.harita-gemi {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    font-size: 30px;
+    transform: rotate(45deg);
+    z-index: 5;
+}
+
+/* Gezegenlerin kapsayıcısını büyüttük */
+.harita-noktasi {
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: none;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* Wrapper’ın boş alanına tıklama çalmasın; sadece görsel öğeler tetiklesin */
+    pointer-events: none;
+}
+
+.astra {
+    animation-delay: 0s;
+}
+
+.vega {
+    animation-delay: 1s;
+}
+
+.nora {
+    animation-delay: 0.5s;
+}
+
+.kron {
+    animation-delay: 1.5s;
+}
+
+@keyframes süzülme {
+    0% {
+        transform: translateY(0px);
+    }
+
+    100% {
+        transform: translateY(-15px);
+    }
+}
+
+/* Hover: wrapper’a değil, görsel öğelere uygulanır */
+.gezegen-kure:hover,
+.gezegen-isim:hover {
+    z-index: 20;
+}
+
+.gezegen-kure:hover {
+    filter: brightness(1.08) !important;
+}
+
+/* Gezegen Küresi Temel Ayarları */
+.gezegen-kure {
+    border-radius: 50%;
+    position: relative;
+    z-index: 2;
+    transition: filter 0.3s ease;
+    image-rendering: auto;
+    transform: translateZ(0);
+    /* Hover efekti için yumuşak geçiş */
+}
+
+/* Farenin üstüne gelince gezegenin parlaklığı artsın */
+.harita-noktasi:hover .gezegen-kure {
+    filter: brightness(1.08);
+}
+
+/* Gezegen küresini ve ismini tıklanabilir yap (wrapper değil) */
+.gezegen-kure,
+.gezegen-isim {
+    pointer-events: auto;
+    cursor: pointer;
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.gezegen-isim {
+    margin-top: 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    /* İsimleri de gezegenlere uyumlu olarak büyüttük */
+    color: #fff;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px #ffffff;
+    transition: 0.3s;
+    z-index: 3;
+}
+
+/* =======================================================
+   GEZEGENLERE ÖZEL İSİM PARLAMA EFEKTLERİ (HOVER)
+   ======================================================= */
+/* wrapper pointer-events:none olduğu için isim hover'ı doğrudan tanımlıyoruz */
+.astra .gezegen-isim:hover {
+    color: #e056fd;
+    text-shadow: 0 0 15px #e056fd;
+}
+
+/* Mor */
+.vega .gezegen-isim:hover {
+    color: #ffaa00;
+    text-shadow: 0 0 15px #ffaa00;
+}
+
+/* Turuncu */
+.nora .gezegen-isim:hover {
+    color: #5ae0ff;
+    text-shadow: 0 0 15px #5ae0ff;
+}
+
+/* Mavi */
+.kron .gezegen-isim:hover {
+    color: #55efc4;
+    text-shadow: 0 0 15px #55efc4;
+}
+
+/* Yeşil */
+
+/* =======================================================
+   TEMEL GEZEGEN KÜRESİ KODLARI (BOŞLUKLARI YOK EDEN YÖNTEM)
+   ======================================================= */
+.gezegen-kure {
+    /* Eski border-radius ve box-shadow SİLİNDİ */
+    position: relative;
+    z-index: 2;
+    transition: filter 0.3s ease;
+    /* CSS Değişkeni (var) ile PNG'nin sadece dolu piksellerini saran gölge */
+    filter: none;
+}
+
+.gezegen-kure:hover {
+    filter: brightness(1.08);
+}
+
+.gezegen-kure::after {
+    content: none;
+}
+
+/* =======================================================
+   GEZEGENLERİN KENDİNE HAS BOYUT VE RENK DEĞİŞKENLERİ
+   ======================================================= */
+
+/* --- GEZEGEN 1: ASTRA (Artık Mor Tema) --- */
+.astra .gezegen-kure {
+    width: 120px;
+    height: 120px;
+    background-image: url('../assets/images/gezegen1.png');
+    /* Resmin kesilmeden tam sığması için 'cover' yerine 'contain' yaptık */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    --parlama-rengi: rgba(224, 86, 253, 0.8);
+    /* Mor Işık */
+}
+
+/* --- GEZEGEN 2: VEGA (Turuncu Tema) --- */
+.vega .gezegen-kure {
+    width: 90px;
+    height: 90px;
+    background-image: url('../assets/images/gezegen2.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    --parlama-rengi: rgba(255, 170, 0, 0.8);
+    /* Turuncu Işık */
+}
+
+/* --- GEZEGEN 3: NORA (Artık Mavi Tema) --- */
+.nora .gezegen-kure {
+    width: 150px;
+    height: 150px;
+    background-image: url('../assets/images/gezegen3.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    --parlama-rengi: rgba(90, 224, 255, 0.8);
+    /* Mavi Işık */
+}
+
+/* --- GEZEGEN 4: KRON (Yeşil Tema) --- */
+.kron .gezegen-kure {
+    width: 130px;
+    height: 130px;
+    background-image: url('../assets/images/gezegen4.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    --parlama-rengi: rgba(85, 239, 196, 0.8);
+    /* Yeşil Işık */
+}
+
+.gezegen-skor {
+    margin-top: 8px;
+    color: #55efc4;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(85, 239, 196, 0.7);
+    pointer-events: auto;
+}
+
+/* 
+  Savaş öncesi ve bölüm seçimi panellerinin tam ekran arkasını karartan ve bulanıklaştıran div.
+  Neden kullanılır: Oyuncunun dikkatini sadece açılan bilgi ekranına çekmek için.
+*/
+.bolum-bilgi-paneli {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(3, 8, 18, 0.68);
+    backdrop-filter: blur(6px);
+    pointer-events: auto;
+}
+
+.bolum-bilgi-kutu {
+    width: min(560px, calc(100vw - 36px));
+    box-sizing: border-box;
+    padding: 26px;
+    border: 1px solid rgba(90, 224, 255, 0.65);
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(8, 14, 28, 0.96), rgba(16, 24, 42, 0.92));
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55), 0 0 26px rgba(90, 224, 255, 0.18);
+    text-align: left;
+}
+
+.bolum-bilgi-ust {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+.bolum-bilgi-asama {
+    color: #55efc4;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+.bolum-bilgi-kutu h3 {
+    margin: 0;
+    color: #ffffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 30px;
+    letter-spacing: 0;
+}
+
+.bolum-bilgi-metin {
+    margin: 0 0 14px;
+    color: #c9d4e7;
+    font-size: 19px;
+    line-height: 1.45;
+}
+
+.bolum-bilgi-taretler {
+    display: grid;
+    gap: 8px;
+}
+
+.bilgi-taret {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    min-height: 42px;
+    padding: 8px 10px;
+    border: 1px solid rgba(90, 224, 255, 0.28);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.bilgi-taret.kapali {
+    opacity: 0.48;
+    border-color: rgba(255, 71, 71, 0.35);
+}
+
+.bilgi-taret-numara {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #ffffff;
+    border: 1px solid rgba(90, 224, 255, 0.75);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+}
+
+.bilgi-taret strong {
+    display: block;
+    color: #ffffff;
+    font-size: 17px;
+}
+
+.bilgi-taret span {
+    display: block;
+    color: #aeb9cd;
+    font-size: 15px;
+}
+
+.bilgi-taret-durum {
+    color: #55efc4;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+}
+
+.bilgi-taret.kapali .bilgi-taret-durum {
+    color: #ff8b8b;
+}
+
+.bolum-bilgi-butonlar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+/* ======================================================
+   SCI-FI HUD — YENİDEN TASARIM
+   ====================================================== */
+
+/* --- Kök CSS değişkenleri --- */
+:root {
+    --clr-bg:      #071018;
+    --clr-cyan:    #41e0ff;
+    --clr-purple:  #8b5cf6;
+    --clr-danger:  #ff4d6d;
+    --clr-credits: #f9ca24;
+    --clr-panel:   rgba(7, 16, 24, 0.78);
+    --clr-border:  rgba(65, 224, 255, 0.22);
+    --blur:        blur(12px);
+    --hud-safe-top: 52px;
+}
+
+/* Ana HUD kapsayıcı — tüm ekranı kaplar, pointer-events sadece gerekli alanlarda açık */
+/* 
+  Savaş ekranında, üst, alt ve yan barları kapsayan ana arayüz görünmez katmanı.
+  Neden kullanılır: Diğer tüm HUD elementlerini (Can, Skor, Taretler) ekranın doğru yerlerine (flexbox veya absolute ile) konumlandırmak için.
+*/
+.oyun-hud {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================================
+   ÜST ŞERIT — ince, bilgi yoğun
+   ========================================= */
+.hud-top-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 44px;
+    padding: 0 16px;
+    background: rgba(7, 16, 24, 0.82);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border-bottom: 1px solid var(--clr-border);
+    box-shadow: 0 2px 18px rgba(65, 224, 255, 0.08);
+    pointer-events: auto;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.hud-top-left,
+.hud-top-center,
+.hud-top-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hud-top-right { margin-left: auto; gap: 10px; }
+
+.hud-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(65, 224, 255, 0.55);
+    text-transform: uppercase;
+}
+
+.hud-val {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 0 10px var(--clr-cyan);
+}
+
+.hud-sep { color: rgba(255,255,255,0.3); font-size: 14px; }
+
+.hud-timer {
+    color: var(--clr-cyan);
+    text-shadow: 0 0 14px var(--clr-cyan);
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-glow {
+    from { text-shadow: 0 0 8px var(--clr-cyan); }
+    to   { text-shadow: 0 0 20px var(--clr-cyan), 0 0 40px rgba(65,224,255,0.3); }
+}
+
+.hud-pause-btn {
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.45);
+    color: #c4b5fd;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    pointer-events: auto;
+}
+.hud-pause-btn:hover {
+    background: rgba(139, 92, 246, 0.35);
+    border-color: var(--clr-purple);
+    box-shadow: 0 0 14px rgba(139, 92, 246, 0.4);
+    color: #ffffff;
+    transform: scale(1.04);
+}
+
+/* =========================================
+   SOL SIDEBAR — taret slotları
+   ========================================= */
+.hud-sidebar {
+    position: absolute;
+    top: 52px;
+    left: 12px;
+    width: 130px;
+    background: var(--clr-panel);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--clr-border);
+    border-radius: 10px;
+    padding: 10px 8px;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(65,224,255,0.06);
+}
+
+.sidebar-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--clr-border);
+}
+
+.sidebar-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--clr-cyan);
+    text-shadow: 0 0 8px var(--clr-cyan);
+}
+
+.sidebar-hint {
+    font-size: 9px;
+    color: rgba(255,255,255,0.28);
+    letter-spacing: 0.5px;
+}
+
+/* Taret paneli — tek sütun sidebar'da */
+.hud-taret-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.taret-slot {
+    position: relative;
+    height: 62px;
+    box-sizing: border-box;
+    border: 1px solid rgba(65, 224, 255, 0.28);
+    background: rgba(65, 224, 255, 0.04);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    color: var(--clr-cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    cursor: pointer;
+    border-radius: 7px;
+    transition: all 0.25s ease;
+    user-select: none;
+    overflow: hidden;
+}
+
+.taret-slot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(65,224,255,0.06) 0%, transparent 60%);
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.taret-slot:hover:not(.kilitli) {
+    background: rgba(65, 224, 255, 0.14);
+    border-color: var(--clr-cyan);
+    box-shadow: 0 0 16px rgba(65, 224, 255, 0.25), inset 0 0 10px rgba(65,224,255,0.08);
+    transform: translateX(2px);
+}
+
+.taret-slot.alinabilir {
+    border-color: rgba(85, 239, 196, 0.55);
+    background: rgba(85, 239, 196, 0.08);
+}
+
+.taret-slot.aktif-modul {
+    border-color: #55efc4;
+    background: rgba(85, 239, 196, 0.1);
+    box-shadow: 0 0 12px rgba(85, 239, 196, 0.3), inset 0 0 8px rgba(85,239,196,0.12);
+    animation: slot-pulse 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes slot-pulse {
+    from { box-shadow: 0 0 8px rgba(85,239,196,0.25); }
+    to   { box-shadow: 0 0 20px rgba(85,239,196,0.55), inset 0 0 12px rgba(85,239,196,0.18); }
+}
+
+.taret-slot.aktif-modul .modul-sure { color: #55efc4; }
+
+.taret-slot.kilitli {
+    border-color: rgba(255, 77, 109, 0.22);
+    background: rgba(255, 77, 109, 0.04);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.taret-numara {
+    position: absolute;
+    top: 4px;
+    right: 5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(4, 9, 18, 0.9);
+    border: 1px solid rgba(65, 224, 255, 0.5);
+    color: rgba(255,255,255,0.7);
+    font-size: 9px;
+    line-height: 16px;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.taret-slot.kilitli .taret-numara {
+    border-color: rgba(255,77,109,0.4);
+    color: rgba(255,77,109,0.7);
+}
+
+.modul-ad {
+    color: #ffffff;
+    font-size: 9px;
+    line-height: 1;
+    text-align: center;
+    padding: 0 4px;
+}
+
+.modul-gorev {
+    color: #55efc4;
+    font-size: 8px;
+    line-height: 1;
+    text-align: center;
+}
+
+.modul-fiyat,
+.modul-sure {
+    color: rgba(174, 185, 205, 0.75);
+    font-size: 8px;
+    line-height: 1;
+}
+
+/* =========================================
+   ALT STAT BAR
+   ========================================= */
+.hud-bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0 14px;
+    background: rgba(7, 16, 24, 0.82);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border-top: 1px solid var(--clr-border);
+    box-shadow: 0 -4px 24px rgba(65, 224, 255, 0.06);
+    pointer-events: none;
+}
+
+.hud-stat-block {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 10px;
+    border-right: 1px solid rgba(65, 224, 255, 0.1);
+}
+
+.hud-stat-block:last-child { border-right: none; }
+.hud-stat-block--wide { flex: 1.4; }
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    color: rgba(65, 224, 255, 0.45);
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(255,255,255,0.3);
+}
+
+.stat-value.danger {
+    color: var(--clr-danger);
+    text-shadow: 0 0 10px var(--clr-danger);
+}
+
+.stat-value.credits {
+    color: var(--clr-credits);
+    text-shadow: 0 0 10px var(--clr-credits);
+}
+
+.stat-bar-wrap {
+    height: 5px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.stat-bar {
+    height: 100%;
+    border-radius: inherit;
+    transition: width 0.3s ease;
+    width: 100%;
+}
+
+.stat-bar-hp {
+    background: linear-gradient(90deg, var(--clr-danger), #ff8fab);
+    box-shadow: 0 0 8px rgba(255,77,109,0.6);
+}
+
+.stat-bar-ammo {
+    background: linear-gradient(90deg, var(--clr-cyan), #a0f0ff);
+    box-shadow: 0 0 8px rgba(65,224,255,0.5);
+}
+
+/* Dusman progress bar (reuse) */
+.hud-dusman-iz {
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+    margin-top: 2px;
+}
+
+.hud-dusman-bar {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #55efc4, var(--clr-cyan), var(--clr-danger));
+    box-shadow: 0 0 8px rgba(65,224,255,0.4);
+    transition: width 0.2s ease;
+}
+
+/* Combo Gostergesi */
+.hud-combo-block {
+    flex: 0 0 72px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 2px;
+}
+
+.combo-val {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    transition: color 0.3s ease, text-shadow 0.3s ease, transform 0.15s ease;
+    display: block;
+}
+
+.combo-val[data-combo="1"] {
+    color: rgba(255,255,255,0.25);
+    text-shadow: none;
+    transform: scale(0.9);
+}
+
+.combo-val[data-combo="2"],
+.combo-val[data-combo="3"] {
+    color: #f9ca24;
+    text-shadow: 0 0 12px rgba(249,202,36,0.7);
+    transform: scale(1);
+}
+
+.combo-val[data-combo="4"],
+.combo-val[data-combo="5"],
+.combo-val[data-combo="6"] {
+    color: #ff8c00;
+    text-shadow: 0 0 16px rgba(255,140,0,0.8);
+    transform: scale(1.05);
+}
+
+.combo-val[data-combo="7"],
+.combo-val[data-combo="8"],
+.combo-val[data-combo="9"] {
+    color: var(--clr-danger);
+    text-shadow: 0 0 20px rgba(255,77,109,0.9);
+    transform: scale(1.12);
+    animation: combo-pulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes combo-pulse {
+    from { text-shadow: 0 0 14px rgba(255,77,109,0.7); transform: scale(1.1); }
+    to   { text-shadow: 0 0 30px rgba(255,77,109,1), 0 0 60px rgba(255,77,109,0.4); transform: scale(1.18); }
+}
+
+/* Responsive — 900px */
+@media (max-width: 900px) {
+    :root { --hud-safe-top: 52px; }
+    .hud-sidebar { width: 110px; }
+    .taret-slot { height: 52px; }
+    .hud-bottom-bar { height: 58px; }
+    .stat-value { font-size: 13px; }
+}
+
+/* =======================================================
+   Space Defense guncellemeleri
+   ======================================================= */
+
+:root {
+    --hud-safe-top: 116px;
+}
+
+.oyun-butonu,
+.gezegen-kure,
+.gezegen-isim,
+.taret-slot {
+    cursor: url('../assets/images/imlec.png') 32 32, crosshair;
+}
+
+.ses-sabit-btn[data-state="music-on"]::before,
+.ses-sabit-btn[data-state="music-off"]::before {
+    content: "\266B";
+    font-size: 23px;
+}
+
+.ses-sabit-btn[data-state="shoot-on"]::before,
+.ses-sabit-btn[data-state="shoot-off"]::before {
+    content: "";
+    width: 25px;
+    height: 4px;
+    border-radius: 999px;
+    background: currentColor;
+    box-shadow: 10px 0 0 -1px currentColor, -7px 0 0 -2px currentColor;
+    transform: rotate(-28deg);
+    display: block;
+}
+
+.ses-sabit-btn[data-state="shoot-on"]::after,
+.ses-sabit-btn[data-state="shoot-off"]::after {
+    transform: rotate(-45deg);
+}
+
+.ses-sabit-btn[data-state$="-off"] {
+    color: #ff8b8b;
+    border-color: rgba(255, 71, 71, 0.68);
+}
+
+.ses-sabit-btn[data-state$="-off"]::after {
+    content: "";
+    position: absolute;
+    width: 30px;
+    height: 2px;
+    inset: auto;
+    opacity: 1;
+    border: 0;
+    border-radius: 2px;
+    background: #ff4747;
+    box-shadow: 0 0 8px rgba(255, 71, 71, 0.7);
+    transform: rotate(-42deg);
+}
+
+.harita-yolu {
+    position: absolute;
+    top: calc(24% + 78px);
+    left: 22%;
+    right: 22%;
+    height: 0;
+    z-index: 4;
+    border-top: 4px dashed rgba(90, 224, 255, 0.78);
+    background: none;
+    box-shadow: 0 0 14px rgba(90, 224, 255, 0.35);
+}
+
+.ana-gezegen,
+.kron-eglence {
+    height: 230px;
+}
+
+.gezegen-durum {
+    margin-top: 8px;
+    padding: 4px 9px;
+    border: 1px solid rgba(90, 224, 255, 0.45);
+    border-radius: 999px;
+    color: #55efc4;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    background: rgba(3, 8, 18, 0.68);
+    pointer-events: auto;
+}
+
+.harita-noktasi.kilitli {
+    opacity: 0.46;
+    filter: grayscale(0.8);
+}
+
+.harita-noktasi.kilitli .gezegen-durum {
+    color: #ff8b8b;
+    border-color: rgba(255, 71, 71, 0.48);
+}
+
+.harita-noktasi.kilitli .gezegen-kure,
+.harita-noktasi.kilitli .gezegen-isim {
+    cursor: not-allowed;
+}
+
+.hud-stat-panel {
+    flex: 0 0 330px;
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
+}
+
+.modul-gorev {
+    color: #55efc4;
+    font-size: 10px;
+    line-height: 1;
+}
+
+.oyun-bildirimi {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--hud-safe-top) + 16px);
+    z-index: 130;
+    padding: 8px 14px;
+    border: 1px solid rgba(90, 224, 255, 0.7);
+    border-radius: 6px;
+    background: rgba(3, 8, 18, 0.82);
+    color: #ffffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px;
+    pointer-events: none;
+    transform: translateX(-50%);
+    animation: bildirimUc 1.3s ease forwards;
+}
+
+@keyframes bildirimUc {
+    0% { opacity: 0; transform: translate(-50%, 8px); }
+    18% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -22px); }
+}
+
+.ogretici-panel {
+    width: min(920px, calc(100vw - 34px));
+    max-width: 920px;
+    max-height: calc(100vh - 44px);
+    overflow: auto;
+}
+
+.ogretici-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    text-align: left;
+}
+
+.ogretici-grid section {
+    border: 1px solid rgba(90, 224, 255, 0.24);
+    border-radius: 8px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.ogretici-grid h3 {
+    margin: 0 0 8px;
+    color: #55efc4;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+}
+
+.ogretici-grid p {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.35;
+}
+
+@media (max-width: 900px) {
+    :root {
+        --hud-safe-top: 190px;
+    }
+
+    .hud-stat-panel {
+        flex: 1 1 auto;
+        grid-template-columns: repeat(2, minmax(124px, 1fr));
+    }
+
+    .harita-yolu {
+        left: 18%;
+        right: 18%;
+    }
+
+    .ogretici-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =======================================================
+   Sunum duzenlemeleri: gezegen secimi ve taretler
+   ======================================================= */
+
+.harita-noktasi {
+    transform-origin: center;
+}
+
+.harita-noktasi .gezegen-kure {
+    transition: transform 0.28s ease, filter 0.28s ease;
+}
+
+.harita-noktasi:hover .gezegen-kure {
+    transform: scale(1.06);
+    filter: brightness(1.14) drop-shadow(0 0 16px var(--parlama-rengi));
+}
+
+.harita-noktasi:hover .gezegen-isim {
+    transform: translateY(-2px);
+}
+
+.gezegen-durum {
+    min-width: 88px;
+}
+
+.harita-noktasi.kilitli {
+    opacity: 1;
+    filter: none;
+}
+
+.harita-noktasi.kilitli .gezegen-kure,
+.harita-noktasi.kilitli .gezegen-isim {
+    cursor: url('../assets/images/imlec.png') 32 32, crosshair;
+}
+
+.bolum-bilgi-paneli {
+    position: fixed;
+}
+
+.bolum-bilgi-kutu {
+    width: min(620px, calc(100vw - 32px));
+    max-height: calc(100vh - 28px);
+    overflow: hidden;
+    padding: 18px;
+}
+
+.bolum-bilgi-detaylar {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    margin: 0 0 10px;
+}
+
+.bolum-bilgi-detay {
+    padding: 7px 8px;
+    border-radius: 7px;
+    border: 1px solid rgba(90, 224, 255, 0.22);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.bolum-bilgi-detay strong {
+    display: block;
+    color: #55efc4;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    margin-bottom: 3px;
+}
+
+.bolum-bilgi-detay span {
+    color: #ffffff;
+    font-size: 13px;
+}
+
+.bolum-bilgi-kutu h3 {
+    font-size: 24px;
+}
+
+.bolum-bilgi-metin {
+    margin-bottom: 10px;
+    font-size: 16px;
+    line-height: 1.25;
+}
+
+.bolum-bilgi-taretler {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.bilgi-taret {
+    grid-template-columns: 24px 1fr auto;
+    gap: 7px;
+    min-height: 34px;
+    padding: 6px 8px;
+}
+
+.bilgi-taret-numara {
+    width: 22px;
+    height: 22px;
+    font-size: 10px;
+}
+
+.bilgi-taret strong {
+    font-size: 13px;
+}
+
+.bilgi-taret span {
+    display: none;
+}
+
+.bilgi-taret-durum {
+    font-size: 10px;
+}
+
+.bolum-bilgi-butonlar {
+    margin-top: 10px;
+}
+
+.hud-sidebar {
+    width: 194px;
+    max-height: calc(100vh - 128px);
+    overflow-y: hidden;
+}
+
+.hud-taret-panel {
+    gap: 9px;
+}
+
+.taret-slot {
+    min-height: 58px;
+    height: auto;
+    align-items: flex-start;
+    padding: 9px 10px 8px 11px;
+    gap: 2px;
+    text-align: left;
+}
+
+.taret-slot:hover:not(.kilitli) {
+    transform: translateX(3px);
+}
+
+.modul-ad {
+    width: calc(100% - 22px);
+    color: #ffffff;
+    font-size: 11px;
+    line-height: 1.15;
+    text-align: left;
+}
+
+.modul-gorev,
+.modul-aciklama,
+.modul-ozellik {
+    width: 100%;
+    color: rgba(215, 224, 242, 0.82);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10.5px;
+    line-height: 1.15;
+    text-align: left;
+}
+
+.modul-gorev {
+    color: #55efc4;
+}
+
+.modul-fiyat,
+.modul-sure {
+    color: #f9ca24;
+    font-size: 9.5px;
+    line-height: 1.1;
+}
+
+.savas-oncesi-panel {
+    position: absolute;
+    inset: 0;
+    z-index: 125;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+.savas-oncesi-kutu {
+    width: min(430px, calc(100vw - 220px));
+    margin-left: 180px;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(90, 224, 255, 0.58);
+    background: rgba(7, 16, 30, 0.86);
+    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.55), 0 0 30px rgba(90, 224, 255, 0.14);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    text-align: left;
+    pointer-events: auto;
+}
+
+.savas-oncesi-kutu h3 {
+    margin: 6px 0 6px;
+    color: #ffffff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0;
+}
+
+.savas-oncesi-kutu p {
+    margin: 0 0 9px;
+    color: #d7e0f2;
+    font-size: 15px;
+    line-height: 1.25;
+}
+
+.savas-oncesi-dusmanlar {
+    display: grid;
+    gap: 5px;
+}
+
+.savas-oncesi-toplam {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    justify-content: center;
+    align-items: center;
+    margin: 0 0 9px;
+    padding: 7px 10px;
+    border: 1px solid rgba(85, 239, 196, 0.34);
+    border-radius: 7px;
+    background: rgba(85, 239, 196, 0.08);
+    color: #55efc4;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px;
+}
+
+.savas-oncesi-toplam span {
+    display: block;
+}
+
+.savas-dusman-satiri {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 8px;
+    border: 1px solid rgba(90, 224, 255, 0.18);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.04);
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.savas-dusman-satiri strong {
+    color: #55efc4;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+}
+
+.savas-oncesi-kutu .kucuk-buton {
+    display: block;
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 900px) {
+    .secim-baslik {
+        top: 3% !important;
+        width: calc(100vw - 24px);
+    }
+
+    .secim-baslik .panel-baslik {
+        font-size: 34px !important;
+    }
+
+    .secim-baslik .panel-metin {
+        font-size: 16px !important;
+    }
+
+    .harita-noktasi {
+        width: 180px;
+        height: 180px;
+    }
+
+    .harita-noktasi.astra { top: 18% !important; left: 2% !important; }
+    .harita-noktasi.vega { top: 18% !important; left: calc(50% - 90px) !important; }
+    .harita-noktasi.nora { top: 18% !important; right: 2% !important; }
+    .harita-noktasi.kron { bottom: 5% !important; left: calc(50% - 90px) !important; }
+
+    .gezegen-isim {
+        font-size: 16px;
+    }
+
+    .astra .gezegen-kure,
+    .vega .gezegen-kure,
+    .nora .gezegen-kure,
+    .kron .gezegen-kure {
+        width: 96px;
+        height: 96px;
+    }
+
+    .ogretici-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bolum-bilgi-detaylar {
+        grid-template-columns: 1fr;
+    }
+
+    .bolum-bilgi-taretler {
+        grid-template-columns: 1fr;
+        gap: 5px;
+    }
+
+    .hud-sidebar {
+        width: min(190px, calc(100vw - 24px));
+        max-height: calc(100vh - 136px);
+        overflow: hidden;
+    }
+
+    .taret-slot {
+        min-height: 54px;
+    }
+
+    .hud-bottom-bar {
+        overflow-x: auto;
+    }
+
+    .hud-stat-block {
+        min-width: 112px;
+    }
+
+    .savas-oncesi-panel {
+        align-items: flex-start;
+        padding-top: 58px;
+    }
+
+    .savas-oncesi-kutu {
+        margin-left: 0;
+        width: min(430px, calc(100vw - 28px));
+        max-height: none;
+        overflow: visible;
+    }
+}
