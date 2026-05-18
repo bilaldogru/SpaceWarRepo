@@ -1,4 +1,4 @@
-import { createModularLevel } from '../core/modularLevel.js';
+import { createModularLevel } from '../core/level/index.js';
 
 /**
  * Nora gezegeninin bölüm ayarlarını içerir.

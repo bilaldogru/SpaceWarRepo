@@ -1,4 +1,9 @@
-import { createModularLevel } from '../core/modularLevel.js';
+/**
+ * Kron gezegeninin bölüm ayarlarını içerir.
+ * Endless (sonsuz) modun tek aktif gezegendir.
+ * Oyun motorunu doğrudan içe aktarır: js/core/level/index.js
+ */
+import { createModularLevel } from '../core/level/index.js';
 
 export const kronBolumu = createModularLevel({
     isim: 'Kron',

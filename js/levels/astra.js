@@ -1,4 +1,9 @@
-import { createModularLevel } from '../core/modularLevel.js';
+/**
+ * Astra gezegeninin bölüm ayarlarını içerir.
+ * Oyun motoruna (createModularLevel) gönderilen yapılandırma nesnesidir.
+ * Motoru doğrudan içe aktarır: js/core/level/index.js
+ */
+import { createModularLevel } from '../core/level/index.js';
 
 export const astraBolumu = createModularLevel({
     isim: 'Astra',
