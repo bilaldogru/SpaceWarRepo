@@ -43,7 +43,7 @@ Işıksız boşluktan gelen mekanik istilacılar tüm ışığı yutmak ister. A
 | `R` | Mermiyi yeniden doldurur. |
 | Taret kartları (sürükle-bırak) | Tareti uygun canvas alanına yerleştirir. |
 | Ses butonları | Müzik ve efektleri açıp kapatır. |
-| `Escape` veya `Enter` | Oyun bitti ekranından menüye döner. |
+| `Escape`  veya `Enter` | Oyun bitti ekranından menüye döner. |
 
 Kontroller klavye ve fare birlikte kullanılacak şekilde tasarlanmıştır. Klavye gemi hareketi, ateş alternatifi, yeniden doldurma ve menü dönüşü gibi hızlı aksiyonları yönetirken; fare nişan alma, sol tıkla ateş etme ve taretleri sürükle-bırak yöntemiyle yerleştirme işlemlerini sağlar.
 
